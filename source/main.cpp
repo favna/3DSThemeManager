@@ -131,6 +131,10 @@ void cleanup() {
 
 	UI_cleanup();
 	sftd_fini();
+	
+	sceneExit();
+	C3D_Fini();
+
 	sf2d_fini();
 
 	ndspExit();
