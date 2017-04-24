@@ -1,0 +1,28 @@
+<p align="center"><img src="http://i.imgur.com/QVmttR8.png"/></p>
+
+# Description
+
+**Themely** is a custom home menu manager for the Nintendo 3DS.
+
+# Dependencies & Building
+
+- DevkitPro r46
+- ctrulib 1.2.1
+- Latest version of sf2dlib
+- Latest version of sftdlib
+- zlib, libpng, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/devkitPro/3ds_portlibs/ recommended)
+
+You can run `sudo -s; deps&#46;sh; exit` to install sf2dlib, sftdlib, and 3ds-portlibs automatically (`git` and DevkitPro required).
+
+Run `make` to build the 3DSX, CIA, and ZIP files.
+Run `make run` to build & run on Citra. (debugging only -- requires shared_font.bin)
+
+# Known bugs
+
+- The 3DSX version crashes on 11.4 with a 11.4 payload. (Will be fixed in a future version)
+
+# License
+
+This software is licensed under GNU GPLv3. Check LICENSE.
+
+Copyright (c) 2017 Erman SAYIN
