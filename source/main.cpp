@@ -51,6 +51,15 @@ void start() {
 	sf2d_set_clear_color(RGBA8(0x21, 0x21, 0x21, 0xFF));
 	sf2d_set_vblank_wait(1);
 
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+
+	Result res = fontEnsureMapped();
+
+	if (R_FAILED(res))
+		printf("fontEnsureMapped: %08lX\n", res);
+
+	sceneInit();
+
 	sftd_init();
 
 	if(STATE.debug == 0 || STATE.debug == 1)
