@@ -148,6 +148,7 @@ int main(int argc, char **argv) {
 	// Main loop
 	while (aptMainLoop() && !(hidKeysDown() & KEY_START) && !closing){
 		INPUT_handle();
+		textVtxArrayPos = 0; // Clear the text vertex array
 		UI_update();
 	}
 
