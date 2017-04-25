@@ -1,4 +1,4 @@
-<p align="center"><img src="http://i.imgur.com/QVmttR8.png"/></p>
+<p align="center"><img src="https://github.com/ErmanSayin/Themely/raw/master/meta/banner_3ds.png"/></p>
 
 # Description
 
@@ -12,7 +12,7 @@
 - Latest version of sftdlib
 - zlib, libpng, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/devkitPro/3ds_portlibs/ recommended)
 
-You can run `sudo -s; deps&#46;sh; exit` to install sf2dlib, sftdlib, and 3ds-portlibs automatically (`git` and DevkitPro required).
+You can run `sudo -s; deps.sh; exit` to install sf2dlib, sftdlib, and 3ds-portlibs automatically (`git` and DevkitPro required).
 
 Run `make` to build the 3DSX, CIA, and ZIP files.
 Run `make run` to build & run on Citra. (debugging only -- requires shared_font.bin)
