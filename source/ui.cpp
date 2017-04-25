@@ -136,6 +136,13 @@ void drawMain(gfxScreen_t screen) {
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 170 + BGMBtn + fullscreenBtn, 400, 0, 20, 20);
 			sftd_draw_text(FONT.normal, 202, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "Install");
 
+			// without bgm
+			s = "w/o BGM";
+			int w = sftd_get_text_width(FONT.normal, 13, s.c_str());
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40, 170 + BGMBtn + fullscreenBtn, 520, 0, 40, 20);
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40 - 12, 170 + BGMBtn + fullscreenBtn, 560, 0, 20, 20);
+			sftd_draw_text(FONT.normal, 400 - w - 8, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "w/o BGM");
+
 			// preview
 			if(themes[currentSelectedItem].preview && !LightLock_TryLock(&themes[currentSelectedItem].preview_lock)){
 				if(previewX == 8.f) {

@@ -50,9 +50,12 @@ void INPUT_handle() {
 			if(kDown & KEY_RIGHT)
 				selectTheme(min((int)themes.size() - 1, currentSelectedItem + 5));
 
-			if(kDown & KEY_A){
+			if(kUp & KEY_A){
 				isInstalling = true;
-				queueTask(installTheme, (void*)currentSelectedItem);
+				if(kHeld & KEY_R)
+					queueTask(installTheme, (void*)true);
+				else
+					queueTask(installTheme, (void*)false);
 			}
 		}
 

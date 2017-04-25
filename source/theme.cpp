@@ -573,7 +573,7 @@ void loadPreview(void* id){
 	LightLock_Unlock(&themes[(int)id].preview_lock);
 }
 
-void installTheme(void* id){
+void installTheme(void* noBGM){
 	installProgress = "Reading body_LZ.bin...";
 
 	Result ret = 0;
@@ -581,15 +581,16 @@ void installTheme(void* id){
 	vector<char> BGMData;
 
 	// Load data
-	if(!themes[(int)id].isZip){
-		if(fileToVector(string("/Themes/") + themes[(int)id].fileName + "/body_LZ.bin", bodyData))
+	if(!themes[currentSelectedItem].isZip){
+		if(fileToVector(string("/Themes/") + themes[currentSelectedItem].fileName + "/body_LZ.bin", bodyData))
 			return throwError("Failed to open body_LZ.bin file");
 
 		installProgress += "\nReading BGM.bcstm...";
 
-		fileToVector(string("/Themes/") + themes[(int)id].fileName + "/bgm.bcstm", BGMData);
+		if(!(bool)noBGM)
+			fileToVector(string("/Themes/") + themes[currentSelectedItem].fileName + "/bgm.bcstm", BGMData);
 	} else {
-		unzFile zipFile = unzOpen(string("/Themes/" + string(themes[(int)id].fileName)).c_str());
+		unzFile zipFile = unzOpen(string("/Themes/" + string(themes[currentSelectedItem].fileName)).c_str());
 
 		if(!zipFile)
 			return throwError("Failed to open ZIP file");
@@ -608,7 +609,7 @@ void installTheme(void* id){
 
 		installProgress += "\nReading BGM.bcstm...";
 
-		if(!unzLocateFile(zipFile, "bgm.bcstm", 0)){
+		if(!(bool)noBGM && !unzLocateFile(zipFile, "bgm.bcstm", 0)){
 			if(unzOpenCurrentFile(zipFile))
 				return throwError("Can't open bgm.bcstm file in ZIP");
 
