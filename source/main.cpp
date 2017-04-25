@@ -129,6 +129,9 @@ void cleanup() {
 	romfsExit();
 	fsExit();
 	cfguExit();
+
+	while(aptMainLoop())
+		svcSleepThread(20e6);
 }
 
 int main(int argc, char **argv) {
@@ -137,8 +140,10 @@ int main(int argc, char **argv) {
 	queueTask(checkForUpdate, 0);
 	queueTask(scanThemes, 0);
 
+	srvPublishToSubscriber(0x202, 0);
+
 	// Main loop
-	while (aptMainLoop() && !(hidKeysDown() & KEY_START) && !closing){
+	while (!(hidKeysDown() & KEY_START) && !closing){
 		INPUT_handle();
 		UI_update();
 	}
