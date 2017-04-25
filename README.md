@@ -19,7 +19,7 @@ Run `make run` to build & run on Citra. (debugging only -- requires shared_font.
 
 # Known bugs
 
-- The 3DSX version crashes on 11.4 with a 11.4 payload. (Will be fixed in a future version)
+- The 3DSX version crashes on 11.4 with a 11.4 payload. (A lightweight version of Themely is planned to remedy this issue)
 
 # License
 
