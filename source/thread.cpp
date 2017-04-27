@@ -3,8 +3,8 @@
 
 #include "thread.h"
 
-Thread THREADS[4];
-std::queue<Task> taskQueue;
+Thread THREADS[2];
+vector<Task> taskQueue;
 LightLock taskQueueLock;
 volatile uint threadsRunning = 0;
 
@@ -13,30 +13,43 @@ Thread createThread(ThreadFunc entrypoint, void* arg){
 	s32 prio = 0;
 	svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);
 
-	Thread thread = threadCreate(entrypoint, arg, 1024 * 16, 0x18, -1, false);
+	Thread thread = threadCreate(entrypoint, arg, 1024 * 28, 0x18, -1, false);
 
 	return thread;
 }
 
 void queueTask(ThreadFunc entrypoint, void* arg) {
 	Task task = {entrypoint, arg};
-	LightLock_Lock(&taskQueueLock);
-	taskQueue.push(task);
+	while(true){
+		if(!LightLock_TryLock(&taskQueueLock))
+			break;
+
+		svcSleepThread(1);
+	}
+
+	taskQueue.push_back(task);
 	LightLock_Unlock(&taskQueueLock);
 }
 
 void worker(void* arg) {
 	while (!closing) {
-		LightLock_Lock(&taskQueueLock);
+		while(true){
+			if(!LightLock_TryLock(&taskQueueLock))
+				break;
+
+			svcSleepThread(1);
+		}
+
 		Task task;
 		bool taskReady = false;
 
 		if(!taskQueue.empty()) {
 			task = taskQueue.front();
-			taskQueue.pop();
+			taskQueue.erase(taskQueue.begin());
 
 			taskReady = true;
 		}
+
 		LightLock_Unlock(&taskQueueLock);
 
 		if(taskReady)
@@ -52,14 +65,13 @@ void worker(void* arg) {
 void startWorkers() {
 	LightLock_Init(&taskQueueLock);
 
-	for (size_t i = 0; i < 4; i++) {
+	for (size_t i = 0; i < 2; i++) {
 		THREADS[i] = createThread(worker, (void*)((i+1)*100));
 	}
 }
 
 void cleanTaskQueue() {
-	std::queue<Task> empty;
-	swap(taskQueue, empty);
+	taskQueue.clear();
 }
 
 /*

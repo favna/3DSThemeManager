@@ -87,14 +87,14 @@ int numOfDigits(const string str){
 	return num;
 }
 
-bool fileExists(string name){
+bool fileExists(u16string name){
 	Handle tempFileHandle;
 
 	bool b = FSUSER_OpenFileDirectly(
 		&tempFileHandle,
 		ARCHIVE_SDMC,
 		fsMakePath(PATH_EMPTY, ""),
-		fsMakePath(PATH_ASCII, name.c_str()),
+		fsMakePath(PATH_UTF16, name.data()),
 		FS_OPEN_READ,
 		0x00000000
 	) == 0;
@@ -102,6 +102,17 @@ bool fileExists(string name){
 	FSFILE_Close(tempFileHandle);
 
 	return b;
+}
+
+string u16tstr(u16* str, size_t size){
+	if(size == 0)
+		return string("");
+
+	char* out = new char[size];
+	size_t len = utf16_to_utf8((uint8_t*)out, str, size);
+	out[min(len, size)] = '\0';
+
+	return string(out);
 }
 
 /*
@@ -162,10 +173,10 @@ int fileToVector(string path, vector<char>& vector){
 
 int zippedFileToVector(unzFile zipFile, vector<char>& vector){
 	int err = 0;
-	char* tmp_buf = new char[8192];
+	char* tmp_buf = new char[1024];
 
 	do {
-		err = unzReadCurrentFile(zipFile, tmp_buf, 8192);
+		err = unzReadCurrentFile(zipFile, tmp_buf, 1024);
 
 		if(err < 0){
 			if(tmp_buf)

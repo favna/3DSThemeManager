@@ -104,61 +104,86 @@ void drawMain(gfxScreen_t screen) {
 		sftd_draw_text(FONT.normal, 400 - sftd_get_text_width(FONT.normal, 13, s.c_str()) - 8, 5, 0xFFFFFFFF, 13, s.c_str());
 
 		if(themes.size() != 0){
-			// title
-			sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
+			if(LightLock_TryLock(&themes[currentSelectedItem].lock)){
+				if(!themes[currentSelectedItem].infoIsFullyLoaded)
+					sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].fileName.c_str());
+				else
+					sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
 
-			// description
-			s = wrap(themes[currentSelectedItem].description, 30);
-			sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, s.c_str());
+				sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, "[description not available]");
 
-			// author
-			int authorY = (count(s.begin(), s.end(), '\n') + 1) * 14;
-			s = string("by ") + themes[currentSelectedItem].author;
-			sftd_draw_text(FONT.normal, 400 - sftd_get_text_width(FONT.normal, 13, s.c_str()) - 8, 70 + authorY, 0xFFFFFFFF, 13, s.c_str());
+				s = string("by Unknown");
+				sftd_draw_text(FONT.normal, 400 - sftd_get_text_width(FONT.normal, 13, s.c_str()) - 8, 84, 0xFFFFFFFF, 13, s.c_str());
 
-			// bgm preview button
-			int BGMBtn = 22;
-			if(themes[currentSelectedItem].hasBGM){
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 214, 460, 0, 20, 20);
-				sftd_draw_text(FONT.normal, 202, 216, 0xFFFFFFFF, 13, "BGM preview");
-				BGMBtn = 0;
-			}
+				sf2d_draw_rectangle(8, 54, 160, 160, getLoadingAnim());
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 8, 54, 0, 270, 160, 160);
 
-			// fullscreen preview button
-			int fullscreenBtn = 22;
-			if(themes[currentSelectedItem].preview){
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 192 + BGMBtn, 440, 0, 20, 20);
-				sftd_draw_text(FONT.normal, 202, 194 + BGMBtn, 0xFFFFFFFF, 13, "Fullscreen preview");
-				fullscreenBtn = 0;
-			}
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 170 + 44, 400, 0, 20, 20);
+				sftd_draw_text(FONT.normal, 202, 172 + 44, 0xFFFFFFFF, 13, "Install");
 
-			// install button
-			sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 170 + BGMBtn + fullscreenBtn, 400, 0, 20, 20);
-			sftd_draw_text(FONT.normal, 202, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "Install");
-
-			// without bgm
-			s = "w/o BGM";
-			int w = sftd_get_text_width(FONT.normal, 13, s.c_str());
-			sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40, 170 + BGMBtn + fullscreenBtn, 520, 0, 40, 20);
-			sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40 - 12, 170 + BGMBtn + fullscreenBtn, 560, 0, 20, 20);
-			sftd_draw_text(FONT.normal, 400 - w - 8, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "w/o BGM");
-
-			// preview
-			if(themes[currentSelectedItem].preview && !LightLock_TryLock(&themes[currentSelectedItem].preview_lock)){
-				if(previewX == 8.f) {
-					previewW = (float)(163.f/themes[currentSelectedItem].preview->width);
-					previewH = (float)(196.f/themes[currentSelectedItem].preview->height);
-				}
-
-				sf2d_draw_texture_scale(themes[currentSelectedItem].preview, (int)previewX, (int)previewY, previewW, previewH);
-				LightLock_Unlock(&themes[currentSelectedItem].preview_lock);
+				s = "w/o BGM";
+				int w = sftd_get_text_width(FONT.normal, 13, s.c_str());
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40, 170 + 44, 520, 0, 40, 20);
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40 - 12, 170 + 44, 560, 0, 20, 20);
+				sftd_draw_text(FONT.normal, 400 - w - 8, 172 + 44, 0xFFFFFFFF, 13, "w/o BGM");
 			} else {
-				if(themes[currentSelectedItem].hasPreview){
-					sf2d_draw_rectangle(8, 54, 160, 160, getLoadingAnim());
-					sf2d_draw_texture_part(TEXTURE.ui.tx, 8, 54, 0, 270, 160, 160);
-				} else {
-					sf2d_draw_texture_part(TEXTURE.ui.tx, 8, 54, 160, 270, 160, 160);
+				// title
+				sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
+
+				// description
+				s = wrap(themes[currentSelectedItem].description, 30);
+				sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, s.c_str());
+
+				// author
+				int authorY = (count(s.begin(), s.end(), '\n') + 1) * 14;
+				s = string("by ") + themes[currentSelectedItem].author;
+				sftd_draw_text(FONT.normal, 400 - sftd_get_text_width(FONT.normal, 13, s.c_str()) - 8, 70 + authorY, 0xFFFFFFFF, 13, s.c_str());
+
+				// bgm preview button
+				int BGMBtn = 22;
+				if(themes[currentSelectedItem].hasBGM){
+					sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 214, 460, 0, 20, 20);
+					sftd_draw_text(FONT.normal, 202, 216, 0xFFFFFFFF, 13, "BGM preview");
+					BGMBtn = 0;
 				}
+
+				// fullscreen preview button
+				int fullscreenBtn = 22;
+				if(themes[currentSelectedItem].preview){
+					sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 192 + BGMBtn, 440, 0, 20, 20);
+					sftd_draw_text(FONT.normal, 202, 194 + BGMBtn, 0xFFFFFFFF, 13, "Fullscreen preview");
+					fullscreenBtn = 0;
+				}
+
+				// install button
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 170 + BGMBtn + fullscreenBtn, 400, 0, 20, 20);
+				sftd_draw_text(FONT.normal, 202, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "Install");
+
+				// without bgm
+				s = "w/o BGM";
+				int w = sftd_get_text_width(FONT.normal, 13, s.c_str());
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40, 170 + BGMBtn + fullscreenBtn, 520, 0, 40, 20);
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40 - 12, 170 + BGMBtn + fullscreenBtn, 560, 0, 20, 20);
+				sftd_draw_text(FONT.normal, 400 - w - 8, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "w/o BGM");
+
+				// preview
+				if(themes[currentSelectedItem].hasPreview && themes[currentSelectedItem].preview){
+					if(previewX == 8.f) {
+						previewW = (float)(163.f/themes[currentSelectedItem].preview->width);
+						previewH = (float)(196.f/themes[currentSelectedItem].preview->height);
+					}
+
+					sf2d_draw_texture_scale(themes[currentSelectedItem].preview, (int)previewX, (int)previewY, previewW, previewH);
+				} else {
+					if(themes[currentSelectedItem].hasPreview || !themes[currentSelectedItem].infoIsFullyLoaded){
+						sf2d_draw_rectangle(8, 54, 160, 160, getLoadingAnim());
+						sf2d_draw_texture_part(TEXTURE.ui.tx, 8, 54, 0, 270, 160, 160);
+					} else {
+						sf2d_draw_texture_part(TEXTURE.ui.tx, 8, 54, 160, 270, 160, 160);
+					}
+				}
+
+				LightLock_Unlock(&themes[currentSelectedItem].lock);
 			}
 
 			if(isInstalling){
@@ -177,7 +202,7 @@ void drawMain(gfxScreen_t screen) {
 				sf2d_draw_rectangle(0, 0, 400, 240, 0x88000000);
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 88, 91, 400, 328, 223, 92);
 			}
-		} else {
+		} else if(themes.size() == 0) {
 			string s = "No themes found! :(";
 			sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, s.c_str()) / 2, 38, 0xFFFFFFFF, 24, s.c_str());
 			s = "Go to 3DSThem.es on your computer, download some themes,";
@@ -188,24 +213,34 @@ void drawMain(gfxScreen_t screen) {
 	} else {
 		// themes
 		if(themes.size() != 0){
-			for (size_t i = 0; i < themes.size(); i++) {
-				// TODO: add a check if the entry is on the view
-
+			for (int i = max(0, currentSelectedItem - 3); i < min((int)themes.size(), currentSelectedItem + 5); i++){
 				if(i == currentSelectedItem)
 					sf2d_draw_rectangle(0, 48 * i + 30 - themeListOffset, 320, 48, 0x19FFFFFF);
 
-				if(themes[i].icon)
+				if(LightLock_TryLock(&themes[i].lock)){
+					sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 48 * i + 30 - themeListOffset, 320, 270, 48, 48);
+
+					if(!themes[i].infoIsFullyLoaded)
+						sftd_draw_text(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].fileName.c_str());
+					else
+						sftd_draw_text(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].title.c_str());
+
+					continue;
+				}
+
+				if(themes[i].icon){
 					sf2d_draw_texture_scale(themes[i].icon, 0, 48 * i + 48 + 30 - themeListOffset, 1.0f, -1.0f);
-				else
+				} else
 					sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 48 * i + 30 - themeListOffset, 320, 270, 48, 48);
 
 				sftd_draw_text(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].title.c_str());
+
+				LightLock_Unlock(&themes[i].lock);
 			}
 		} else {
 			string s = "Press START to quit.";
 			sftd_draw_text(FONT.light, 320 / 2 - sftd_get_text_width(FONT.light, 24, s.c_str()) / 2, 240 / 2 - 12, 0xFFFFFFFF, 24, s.c_str());
 		}
-
 
 		// bar
 		sf2d_draw_rectangle(0, 0, 320, 30, 0xFFAB47BC);
@@ -214,9 +249,9 @@ void drawMain(gfxScreen_t screen) {
 		//sf2d_draw_texture_part(TEXTURE.ui.tx, 264, 0, 74, 0, 56, 30);
 
 		// preview (fullscreen)
-		if(themes.size() != 0 && previewX != 8.f && themes[currentSelectedItem].preview && !LightLock_TryLock(&themes[currentSelectedItem].preview_lock)){
+		if(themes.size() != 0 && previewX != 8.f && themes[currentSelectedItem].preview && !LightLock_TryLock(&themes[currentSelectedItem].lock)){
 			sf2d_draw_texture_scale(themes[currentSelectedItem].preview, (int)previewX - 40, (int)previewY - 240, previewW, previewH);
-			LightLock_Unlock(&themes[currentSelectedItem].preview_lock);
+			LightLock_Unlock(&themes[currentSelectedItem].lock);
 		}
 
 		if(isInstalling){
@@ -238,25 +273,6 @@ void drawMain(gfxScreen_t screen) {
 
 		if(currentPlayingAudio || audioIsPlaying)
 			sf2d_draw_rectangle(0, 0, 320, 240, 0x88000000);
-
-		// order
-		//switch (currentOrder) {
-		//	case 0:
-		//		sftd_draw_text(FONT.normal, 2, 0, 0xFFFFFFFF, 13, "most recent");
-		//		break;
-		//	case 1:
-		//		sftd_draw_text(FONT.normal, 2, 0, 0xFFFFFFFF, 13, "most downloaded");
-		//		break;
-		//	case 2:
-		//		sftd_draw_text(FONT.normal, 2, 0, 0xFFFFFFFF, 13, "hottest");
-		//		break;
-		//}
-
-		// search
-		//sftd_draw_text(FONT.normal, 2, 10, 0xFFFFFFFF, 13, currentSearch.c_str());
-
-		// item list
-		//sf2d_draw_texture_part(itemListImg, 0, 30, 0, 0, 320, 210);
 	}
 }
 
@@ -348,6 +364,8 @@ void selectTheme(int id) {
 
 	currentSelectedItem = id;
 	themeListOffset = min((int)themes.size() * 48 + 162, max(0, id * 48 - 81));
+
+	checkInfosToBeLoaded(currentSelectedItem);
 }
 
 void toggleFullscreen(){

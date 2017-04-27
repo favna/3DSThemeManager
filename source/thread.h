@@ -14,5 +14,7 @@ void queueTask(ThreadFunc, void*);
 void startWorkers();
 void cleanTaskQueue();
 
-extern Thread THREADS[4];
+extern Thread THREADS[2];
+extern vector<Task> taskQueue;
+extern LightLock taskQueueLock;
 extern volatile uint threadsRunning;

@@ -144,6 +144,7 @@ int main(int argc, char **argv) {
 
 	// Main loop
 	while (!(hidKeysDown() & KEY_START) && !closing){
+		//printf("app:%lli\nsys:%lli\nbas:%lli\n", osGetMemRegionFree(MEMREGION_APPLICATION), osGetMemRegionFree(MEMREGION_SYSTEM), osGetMemRegionFree(MEMREGION_BASE));
 		INPUT_handle();
 		UI_update();
 	}

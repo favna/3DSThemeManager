@@ -11,7 +11,6 @@
 #include <fstream>
 #include <algorithm>
 #include <cmath>
-#include <queue>
 #include <iterator>
 
 #include <3ds.h>
@@ -20,7 +19,6 @@
 
 using namespace std;
 
-#include "_stringfix.h"
 #include "lib/unzip.h"
 
 struct appState {
@@ -51,7 +49,8 @@ void stripUnicode(string&);
 string wrap(const string, size_t);
 int numOfDigits(const string);
 
-bool fileExists(string);
+bool fileExists(u16string);
+string u16tstr(u16*, size_t);
 int fileToVector(string, vector<char>&);
 //size_t read_file_to_mem(char**, const char*, u32);
 
