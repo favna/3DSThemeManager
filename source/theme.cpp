@@ -554,9 +554,9 @@ void installTheme(void* noBGM){
 
 	// Inject body_lz.bin into BodyCache.bin
 	Handle bodyCacheBin_handle;
-	FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"));
-	if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)bodyData.size()))
-		return throwError("Failed to create BodyCache.bin. Try selecting one of the default color themes on the home menu settings");
+	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"));
+	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)bodyData.size()))
+	//	return throwError("Failed to create BodyCache.bin. Try selecting one of the default color themes on the home menu settings");
 
 	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0))
 		return throwError("Failed to open BodyCache.bin. Try selecting one of the default color themes on the home menu settings");
@@ -572,13 +572,13 @@ void installTheme(void* noBGM){
 
 	// Inject bgm.bcstm into BgmCache.bin
 	Handle bgmCacheBin_handle;
-	FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"));
-	if(BGMData.size() != 0)
-		ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, BGMData.size());
-	else
-		ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008);
-	if(ret)
-		return throwError("Failed to create BgmCache.bin. Try selecting one of the default color themes on the home menu settings");
+	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"));
+	//if(BGMData.size() != 0)
+	//	ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, BGMData.size());
+	//else
+	//	ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008);
+	//if(ret)
+	//	return throwError("Failed to create BgmCache.bin. Try selecting one of the default color themes on the home menu settings");
 
 	if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0))
 		return throwError("Failed to open BgmCache.bin. Try selecting one of the default color themes on the home menu settings");
@@ -603,10 +603,9 @@ void installTheme(void* noBGM){
 	u8* themeManageBin_buf = new u8[0x800];
 	Handle themeManageBin_handle;
 
-
-	FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"));
-	if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
-		return throwError("Failed to create ThemeManage.bin. Try selecting one of the default color themes on the home menu settings");
+	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"));
+	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
+	//	return throwError("Failed to create ThemeManage.bin. Try selecting one of the default color themes on the home menu settings");
 
 	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
 		return throwError("Failed to open ThemeManage.bin. Try selecting one of the default color themes on the home menu settings");
