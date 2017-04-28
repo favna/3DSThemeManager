@@ -665,9 +665,11 @@ void installTheme(void* noBGM){
 }
 
 void toggleBGM(){
-	// TODO: zip support
 	if(!themes[currentSelectedItem].hasBGM)
 		return;
+
+	if(!fileExists(u"/3ds/dspfirm.cdc"))
+		return throwError("DSP dump not found! Use DspDump (should be included with the homebrew starter kit) to dump the DSP firmware required to playback audio.");
 
 	string path;
 
