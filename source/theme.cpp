@@ -237,7 +237,7 @@ void loadThemeInfo(void* id){
 			if(tmpDescription.size() != 0)
 				themes[(int)id].description = tmpDescription;
 
-			if(tmpAuthor.size() != 0)
+			if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
 				themes[(int)id].author = tmpAuthor;
 
 			smdhFile.seekg(0x24C0);
@@ -337,7 +337,7 @@ void loadThemeInfo(void* id){
 						if(tmpDescription.size() != 0)
 							themes[(int)id].description = tmpDescription;
 
-						if(tmpAuthor.size() != 0)
+						if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
 							themes[(int)id].author = tmpAuthor;
 
 						// detects default icons

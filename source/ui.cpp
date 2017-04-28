@@ -131,7 +131,16 @@ void drawMain(gfxScreen_t screen) {
 				sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
 
 				// description
-				s = wrap(themes[currentSelectedItem].description, 30);
+				istringstream iss(wrap(themes[currentSelectedItem].description, 30));
+				s = "";
+				for (size_t i = 0; i < 6; i++){
+					string line;
+
+					if(!getline(iss, line))
+						break;
+
+					s += (i ? "\n" : "") + line;
+				}
 				sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, s.c_str());
 
 				// author
