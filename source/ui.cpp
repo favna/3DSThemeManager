@@ -239,7 +239,9 @@ void drawMain(gfxScreen_t screen) {
 
 				if(themes[i].icon){
 					sf2d_draw_texture_scale(themes[i].icon, 0, 48 * i + 48 + 30 - themeListOffset, 1.0f, -1.0f);
-				} else
+				} else if(themes[i].hasPreview && themes[i].preview)
+					sf2d_draw_texture_part_scale(themes[i].preview, 0, 48 * i + 30 - themeListOffset, 91, 21, 219, 219, 48.f/219, 48.f/219);
+				else
 					sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 48 * i + 30 - themeListOffset, 320, 270, 48, 48);
 
 				sftd_draw_text(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].title.c_str());
