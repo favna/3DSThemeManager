@@ -22,30 +22,7 @@ void start() {
 	cfguInit();
 	ndspInit();
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
-	/*
-	ret = nsInit();
-	printf("%lX\n", ret);
 
-	ret = NS_TerminateProcessTID(0x0004013000001f02);
-	printf("%lX\n", ret);
-	ret = NS_LaunchTitle(0x0004013000001f02, 0, NULL);
-	printf("%lX\n", ret);
-	nsExit();
-
-	Handle mcutrcHandle;
-
-	ret = srvGetServiceHandle(&mcutrcHandle, "mcu::RTC");
-    printf("%lX\n", ret);
-
-    u32 *cmdbuf = getThreadCommandBuffer();
-    cmdbuf[0] = IPC_MakeHeader(0x51,1,0); // 0x510040
-    cmdbuf[1] = true;
-
-    ret = svcSendSyncRequest(mcutrcHandle);
-    printf("%lX\n", ret);
-
-    svcCloseHandle(mcutrcHandle);
-	*/
 	// Initiate libraries
 	sf2d_init();
 	sf2d_set_clear_color(RGBA8(0x21, 0x21, 0x21, 0xFF));
@@ -130,7 +107,7 @@ void cleanup() {
 	fsExit();
 	cfguExit();
 
-	while(aptMainLoop())
+	while(STATE.killHomeMenu && aptMainLoop())
 		svcSleepThread(20e6);
 }
 
@@ -140,14 +117,14 @@ int main(int argc, char **argv) {
 	queueTask(checkForUpdate, 0);
 	queueTask(scanThemes, 0);
 
-	srvPublishToSubscriber(0x202, 0);
-
 	// Main loop
-	while (!(hidKeysDown() & KEY_START) && !closing){
-		//printf("app:%lli\nsys:%lli\nbas:%lli\n", osGetMemRegionFree(MEMREGION_APPLICATION), osGetMemRegionFree(MEMREGION_SYSTEM), osGetMemRegionFree(MEMREGION_BASE));
+	while(!(hidKeysDown() & KEY_START) && !closing){
 		INPUT_handle();
 		UI_update();
 	}
+
+	if(STATE.killHomeMenu)
+		srvPublishToSubscriber(0x202, 0);
 
 	cleanup();
 

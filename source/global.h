@@ -24,9 +24,10 @@ using namespace std;
 struct appState {
 	int debug;
 	bool shouldSaveConfig;
+	bool killHomeMenu;
 };
 
-extern const bool homebrew;
+extern const bool HOMEBREW;
 
 extern volatile bool closing;
 

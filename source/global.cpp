@@ -3,16 +3,14 @@
 
 #include "global.h"
 
-//if(envIsHomebrew())
-	//const bool homebrew = true;
-//else
-	const bool homebrew = false;
+const bool HOMEBREW = envIsHomebrew();
 
 volatile bool closing = false;
 
 appState STATE = {
 	-1, // debug (GFX_TOP, GFX_BOTTOM, -1)
-	false // shouldSaveConfig
+	false, // shouldSaveConfig
+	false // killHomeMenu
 };
 
 u64 ARCHIVE_SD;
