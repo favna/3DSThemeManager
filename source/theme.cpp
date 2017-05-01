@@ -58,7 +58,7 @@ void scanThemes(void*){
 				 	continue;
 				}
 
-				if(unzLocateFile(zipFile, "body_LZ.bin", 0)){
+				if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0)){
 					unzClose(zipFile);
 					printf("NO BODY:%s\n", u16tstr(entry.name, 0x106).c_str());
 					continue;
@@ -142,7 +142,7 @@ void loadPreview(void* id){
 
 		vector<char> pngData;
 
-		if(unzLocateFile(zipFile, "Preview.png", 0)){
+		if(unzLocateFile(zipFile, "Preview.png", 0) && unzLocateFile(zipFile, "preview.png", 0)){
 			unzClose(zipFile);
 			themes[(int)id].hasPreview = false;
 			LightLock_Unlock(&themes[(int)id].lock);
@@ -287,7 +287,7 @@ void loadThemeInfo(void* id){
 			themes[(int)id].hasBGM = true;
 
 		// check if preview exists
-		if(!unzLocateFile(zipFile, "Preview.png", 0))
+		if(!unzLocateFile(zipFile, "Preview.png", 0) || !unzLocateFile(zipFile, "preview.png", 0))
 			themes[(int)id].hasPreview = true;
 
 		if(!unzLocateFile(zipFile, "info.smdh", 0)){
@@ -360,7 +360,7 @@ void loadThemeInfo(void* id){
 
 		vector<char> pngData;
 
-		if(unzLocateFile(zipFile, "Preview.png", 0)){
+		if(unzLocateFile(zipFile, "Preview.png", 0) && unzLocateFile(zipFile, "preview.png", 0)){
 			unzClose(zipFile);
 			themes[(int)id].hasPreview = false;
 			LightLock_Unlock(&themes[(int)id].lock);
@@ -484,7 +484,7 @@ void installTheme(void* noBGM){
 		if(!zipFile)
 			return throwError("Failed to open ZIP file");
 
-		if(unzLocateFile(zipFile, "body_LZ.bin", 0))
+		if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0))
 			return throwError("Can't find body_LZ.bin file in ZIP");
 
 		if(unzOpenCurrentFile(zipFile))
