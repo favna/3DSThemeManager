@@ -107,7 +107,7 @@ void cleanup() {
 	fsExit();
 	cfguExit();
 
-	while(STATE.killHomeMenu && aptMainLoop())
+	while(STATE.killHomeMenu)
 		svcSleepThread(20e6);
 }
 
