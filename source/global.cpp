@@ -9,8 +9,7 @@ volatile bool closing = false;
 
 appState STATE = {
 	-1, // debug (GFX_TOP, GFX_BOTTOM, -1)
-	false, // shouldSaveConfig
-	false // killHomeMenu
+	false // shouldSaveConfig
 };
 
 u64 ARCHIVE_SD;

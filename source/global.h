@@ -24,7 +24,6 @@ using namespace std;
 struct appState {
 	int debug;
 	bool shouldSaveConfig;
-	bool killHomeMenu;
 };
 
 extern const bool HOMEBREW;

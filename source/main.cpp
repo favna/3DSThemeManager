@@ -13,6 +13,8 @@
 
 // Initiates services, starts up modules
 void start() {
+	srvPublishToSubscriber(0x202, 0);
+
 	Result ret;
 
 	// Initiate services
@@ -107,7 +109,7 @@ void cleanup() {
 	fsExit();
 	cfguExit();
 
-	while(STATE.killHomeMenu)
+	while(aptMainLoop())
 		svcSleepThread(20e6);
 }
 
@@ -122,9 +124,6 @@ int main(int argc, char **argv) {
 		INPUT_handle();
 		UI_update();
 	}
-
-	if(STATE.killHomeMenu)
-		srvPublishToSubscriber(0x202, 0);
 
 	cleanup();
 

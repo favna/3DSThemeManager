@@ -463,9 +463,6 @@ void checkInfosToBeLoaded(int id){
 }
 
 void installTheme(void* noBGM){
-	if(!HOMEBREW)
-		STATE.killHomeMenu = true;
-
 	installProgress = "Reading body_LZ.bin...";
 
 	Result ret = 0;
