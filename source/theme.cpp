@@ -669,7 +669,7 @@ void toggleBGM(){
 		return;
 
 	if(!fileExists(u"/3ds/dspfirm.cdc"))
-		return throwError("DSP dump not found! Use DspDump (should be included with the homebrew starter kit) to dump the DSP firmware required to playback audio.");
+		return throwError("DSP dump not found! Use DspDump to dump the DSP firmware required to playback audio.");
 
 	string path;
 
