@@ -27,7 +27,7 @@ void start() {
 
 	// Initiate libraries
 	sf2d_init();
-	sf2d_set_clear_color(RGBA8(0x21, 0x21, 0x21, 0xFF));
+	sf2d_set_clear_color(RGBA8(0x11, 0x11, 0x11, 0xFF));
 	sf2d_set_vblank_wait(1);
 
 	sftd_init();

@@ -21,6 +21,7 @@ struct textureList {
 
 struct fontList {
 	sftd_font* normal;
+	sftd_font* small;
 	sftd_font* light;
 };
 

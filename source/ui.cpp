@@ -118,14 +118,15 @@ void drawMain(gfxScreen_t screen) {
 				sf2d_draw_rectangle(8, 54, 160, 160, getLoadingAnim());
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 8, 54, 0, 270, 160, 160);
 
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 170 + 44, 400, 0, 20, 20);
-				sftd_draw_text(FONT.normal, 202, 172 + 44, 0xFFFFFFFF, 13, "Install");
+				// install button
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219, 400, 0, 15, 15);
+				sftd_draw_text(FONT.small, 196, 220, 0xFFFFFFFF, 11, "Install");
 
-				s = "w/o BGM";
-				int w = sftd_get_text_width(FONT.normal, 13, s.c_str());
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40, 170 + 44, 520, 0, 40, 20);
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40 - 12, 170 + 44, 560, 0, 20, 20);
-				sftd_draw_text(FONT.normal, 400 - w - 8, 172 + 44, 0xFFFFFFFF, 13, "w/o BGM");
+				// without bgm
+				int w = sftd_get_text_width(FONT.small, 11, "w/o BGM");
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 30 - 3, 219, 490, 0, 30, 15);
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 30 - 3 - 10, 219, 520, 0, 15, 15);
+				sftd_draw_text(FONT.small, 400 - w - 8, 220, 0xFFFFFFFF, 11, "w/o BGM");
 			} else {
 				// title
 				sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
@@ -148,32 +149,30 @@ void drawMain(gfxScreen_t screen) {
 				s = string("by ") + themes[currentSelectedItem].author;
 				sftd_draw_text(FONT.normal, 400 - sftd_get_text_width(FONT.normal, 13, s.c_str()) - 8, 70 + authorY, 0xFFFFFFFF, 13, s.c_str());
 
-				// bgm preview button
-				int BGMBtn = 22;
-				if(themes[currentSelectedItem].hasBGM){
-					sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 214, 460, 0, 20, 20);
-					sftd_draw_text(FONT.normal, 202, 216, 0xFFFFFFFF, 13, "BGM preview");
-					BGMBtn = 0;
-				}
-
-				// fullscreen preview button
-				int fullscreenBtn = 22;
-				if(themes[currentSelectedItem].preview){
-					sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 192 + BGMBtn, 440, 0, 20, 20);
-					sftd_draw_text(FONT.normal, 202, 194 + BGMBtn, 0xFFFFFFFF, 13, "Fullscreen preview");
-					fullscreenBtn = 0;
-				}
+				bool fullscreenBtn = themes[currentSelectedItem].preview;
+				bool BGMBtn = themes[currentSelectedItem].hasBGM;
 
 				// install button
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 170 + BGMBtn + fullscreenBtn, 400, 0, 20, 20);
-				sftd_draw_text(FONT.normal, 202, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "Install");
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219 - BGMBtn*17 - fullscreenBtn*17, 400, 0, 15, 15);
+				sftd_draw_text(FONT.small, 196, 220 - BGMBtn*17 - fullscreenBtn*17, 0xFFFFFFFF, 11, "Install");
 
 				// without bgm
-				s = "w/o BGM";
-				int w = sftd_get_text_width(FONT.normal, 13, s.c_str());
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40, 170 + BGMBtn + fullscreenBtn, 520, 0, 40, 20);
-				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 4 - 40 - 12, 170 + BGMBtn + fullscreenBtn, 560, 0, 20, 20);
-				sftd_draw_text(FONT.normal, 400 - w - 8, 172 + BGMBtn + fullscreenBtn, 0xFFFFFFFF, 13, "w/o BGM");
+				int w = sftd_get_text_width(FONT.small, 11, "w/o BGM");
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 30 - 3, 219 - BGMBtn*17 - fullscreenBtn*17, 490, 0, 30, 15);
+				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 30 - 3 - 10, 219 - BGMBtn*17 - fullscreenBtn*17, 520, 0, 15, 15);
+				sftd_draw_text(FONT.small, 400 - w - 8, 220 - BGMBtn*17 - fullscreenBtn*17, 0xFFFFFFFF, 11, "w/o BGM");
+
+				// fullscreen preview button
+				if(fullscreenBtn){
+					sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219 - BGMBtn*17, 430, 0, 15, 15);
+					sftd_draw_text(FONT.small, 196, 220 - BGMBtn*17, 0xFFFFFFFF, 11, "Fullscreen preview");
+				}
+
+				// bgm preview button
+				if(BGMBtn){
+					sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219, 445, 0, 15, 15);
+					sftd_draw_text(FONT.small, 196, 220, 0xFFFFFFFF, 11, "BGM preview");
+				}
 
 				// preview
 				if(themes[currentSelectedItem].hasPreview && themes[currentSelectedItem].preview){
@@ -196,13 +195,12 @@ void drawMain(gfxScreen_t screen) {
 			}
 
 			if(isInstalling){
-				sf2d_draw_rectangle(0, 0, 400, 240, 0xDD000000);
+				sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 65, 91, 400, 270, 269, 58);
 			}
 
 			if(update.size() != 0){
-				sf2d_draw_rectangle(0, 0, 400, 240, 0xDD000000);
-				sf2d_draw_rectangle(20, 20, 360, 216, 0xFF212121);
+				sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
 				sftd_draw_text(FONT.light, 28, 28, 0xFFFFFFFF, 24, "There's a new update!");
 				sftd_draw_text(FONT.normal, 28, 52, 0xFFFFFFFF, 13, update.c_str());
 			}
@@ -249,8 +247,7 @@ void drawMain(gfxScreen_t screen) {
 				LightLock_Unlock(&themes[i].lock);
 			}
 		} else {
-			string s = "Press START to quit.";
-			sftd_draw_text(FONT.light, 320 / 2 - sftd_get_text_width(FONT.light, 24, s.c_str()) / 2, 240 / 2 - 12, 0xFFFFFFFF, 24, s.c_str());
+			sftd_draw_text(FONT.light, 320 / 2 - sftd_get_text_width(FONT.light, 24, "Press START to quit.") / 2, 240 / 2 - 12, 0xFFFFFFFF, 24, "Press START to quit.");
 		}
 
 		// bar
@@ -266,20 +263,21 @@ void drawMain(gfxScreen_t screen) {
 		}
 
 		if(isInstalling){
-			sf2d_draw_rectangle(0, 0, 320, 240, 0xDD000000);
+			sf2d_draw_rectangle(0, 0, 320, 240, 0xEE000000);
 			sftd_draw_text(FONT.light, 8, 8, 0xFFFFFFFF, 24, installProgress.c_str());
 		}
 
 		if(update.size() != 0){
-			sf2d_draw_rectangle(0, 0, 320, 240, 0xDD000000);
-			sf2d_draw_rectangle(20, 20, 280, 210, 0xFF212121);
-			sftd_draw_text(FONT.light, 28, 28, 0xFFFFFFFF, 24, "Install this update?");
+			sf2d_draw_rectangle(0, 0, 320, 240, 0xEE000000);
+			sftd_draw_text(FONT.light, 320 / 2 - sftd_get_text_width(FONT.light, 24, "Install this update?") / 2, 42, 0xFFFFFFFF, 24, "Install this update?");
 
-			sf2d_draw_texture_part(TEXTURE.ui.tx, 28, 56, 400, 0, 20, 20);
-			sftd_draw_text(FONT.normal, 50, 58, 0xFFFFFFFF, 13, "Yes.");
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 98, 669, 270, 100, 40);
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 98 + 25 + 6, 400, 0, 15, 15);
+			sftd_draw_text(FONT.light, 110 + 100 / 2 - sftd_get_text_width(FONT.light, 24, "Yes") / 2, 103, 0xFFFFFFFF, 24, "Yes");
 
-			sf2d_draw_texture_part(TEXTURE.ui.tx, 28, 78, 420, 00, 20, 20);
-			sftd_draw_text(FONT.normal, 50, 80, 0xFFFFFFFF, 13, "No.");
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 142, 669, 270, 100, 40);
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 142 + 25 + 6, 415, 0, 15, 15);
+			sftd_draw_text(FONT.light, 110 + 100 / 2 - sftd_get_text_width(FONT.light, 24, "No") / 2, 147, 0xFFFFFFFF, 24, "No");
 		}
 
 		if(currentPlayingAudio || audioIsPlaying)
@@ -309,6 +307,7 @@ void drawScreen(gfxScreen_t screen) {
 
 void UI_start() {
 	FONT.normal = sftd_load_font_file("romfs:/RobotoCondensed-Regular.ttf");
+	FONT.small = sftd_load_font_file("romfs:/RobotoCondensed-Regular.ttf");
 	FONT.light = sftd_load_font_file("romfs:/RobotoCondensed-Light.ttf");
 	TEXTURE.ui = {NULL, true};
 
@@ -321,6 +320,7 @@ void UI_start() {
 	// font cache thingy to make text render better
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	sftd_draw_text_wrap(FONT.normal, 0, 0, 0x000000FF, 13, 300, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789!?¡¿:()\"'<>\\/#%$-_&*+.,;{}[]@ ");
+	sftd_draw_text_wrap(FONT.small, 0, 0, 0x000000FF, 11, 300, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789!?¡¿:()\"'<>\\/#%$-_&*+.,;{}[]@ ");
 	sftd_draw_text_wrap(FONT.light, 0, 0, 0x000000FF, 24, 300, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789!?¡¿:()\"'<>\\/#%$-_&*+.,;{}[]@ ");
 	sf2d_swapbuffers();
 
