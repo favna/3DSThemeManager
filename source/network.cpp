@@ -150,6 +150,7 @@ void installUpdate(){
 			return throwError("Failed to download update 3DSX. If you're still having problems,\nupdate manually.");
 
 		Handle threedsxHandle;
+		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely.3dsx"));
 		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"));
 		if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"), 0, (u64)threedsxData.size()))
 			return throwError("Failed to create Themely.3dsx");
