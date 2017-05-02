@@ -15,11 +15,11 @@
 You can run the `deps.sh` script to install sf2dlib, sftdlib, and 3ds-portlibs automatically (`git` and DevkitARM required).
 
 Run `make` to build the 3DSX, CIA, and ZIP files.
-Run `make run` to build & run on Citra. (debugging only -- requires shared_font.bin)
+Run `make run` to build & run on Citra. (debugging only)
 
 # Known bugs
 
-- The 3DSX version crashes on 11.4 with a 11.4 payload. (A lightweight version of Themely is planned to remedy this issue)
+Look at [open issues tagged as bugs](https://github.com/ErmanSayin/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Abug).
 
 # License
 
