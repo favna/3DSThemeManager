@@ -112,6 +112,17 @@ string u16tstr(u16* str, size_t size){
 	return string(out);
 }
 
+u16string strtu16str(string& str){
+	if(str.size() == 0)
+		return u16string(u"");
+
+	char16_t* out = new char16_t[str.size()];
+	size_t len = utf8_to_utf16((uint16_t*)out, (uint8_t*)&str[0], str.size());
+	out[min(len, str.size())] = '\0';
+
+	return u16string(out);
+}
+
 /*
 size_t read_file_to_mem(char** data, const char* path, u32 offset){
 	FILE* fp;

@@ -31,10 +31,13 @@ extern bool themesScanned;
 extern bool isInstalling;
 extern string installProgress;
 
+extern bool deletePrompt;
+
 void scanThemes(void*);
 void loadThemeInfo(void*);
 void checkInfosToBeLoaded(int);
 void loadPreview(void*);
 void installTheme(void*);
+void deleteTheme();
 
 void toggleBGM();

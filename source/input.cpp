@@ -3,10 +3,12 @@
 
 #include "input.h"
 
+int XHeldLength = 0;
+
 void INPUT_handle() {
 	hidScanInput();
 
-	if(isError || isInstalling || themes.size() == 0)
+	if(isError || isInstalling || themes.size() == 0 || !themesScanned)
 		return;
 
 	u32 kDown = hidKeysDown();
@@ -30,6 +32,15 @@ void INPUT_handle() {
 		return;
 	}
 
+	if(deletePrompt){
+		if(kUp & KEY_A)
+			deleteTheme();
+		else if(kUp & KEY_B)
+			deletePrompt = false;
+
+		return;
+	}
+
 	if(themesScanned){
 		if(previewX == 8.f){
 			if(kDown & KEY_Y)
@@ -37,6 +48,14 @@ void INPUT_handle() {
 
 			if(currentPlayingAudio || audioIsPlaying)
 				return;
+
+			if(kDown & KEY_X || kHeld & KEY_X)
+				XHeldLength++;
+			else
+				XHeldLength = 0;
+
+			if(XHeldLength >= 15)
+				deletePrompt = true;
 
 			if(kDown & KEY_DOWN)
 				selectTheme(currentSelectedItem + 1);
@@ -59,7 +78,7 @@ void INPUT_handle() {
 			}
 		}
 
-		if(kDown & KEY_X)
+		if(kUp & KEY_X)
 			if((previewX == 8.f || previewX == 0.f) && themes[currentSelectedItem].hasPreview)
 				toggleFullscreen();
 	}

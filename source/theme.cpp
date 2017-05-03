@@ -8,6 +8,8 @@ bool themesScanned = false;
 bool isInstalling = false;
 string installProgress = "";
 
+bool deletePrompt = false;
+
 void scanThemes(void*){
 	Result ret;
 
@@ -662,6 +664,17 @@ void installTheme(void* noBGM){
 
 	isInstalling = false;
 	installProgress = "";
+}
+
+void deleteTheme(){
+	if(!themes[currentSelectedItem].isZip)
+		FSUSER_DeleteDirectoryRecursively(ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(themes[currentSelectedItem].fileName)).data()));
+	else
+		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(themes[currentSelectedItem].fileName)).data()));
+
+	themes.erase(themes.begin() + currentSelectedItem);
+	selectTheme(max(0, currentSelectedItem - 1));
+	deletePrompt = false;
 }
 
 void toggleBGM(){

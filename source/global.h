@@ -51,6 +51,7 @@ int numOfDigits(const string);
 
 bool fileExists(u16string);
 string u16tstr(u16*, size_t);
+u16string strtu16str(string&);
 int fileToVector(string, vector<char>&);
 //size_t read_file_to_mem(char**, const char*, u32);
 
