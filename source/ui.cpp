@@ -34,7 +34,7 @@ u32 getLoadingAnim(){
 	return rainbow[loadingAnimTimer];
 }
 
-Result load_png(string filename, sf2d_texture** texture) {
+Result load_png(string filename, sf2d_texture** texture, bool safe) {
 	// thx MarcusD
 	vector<char> buffer;
 	fileToVector(string(filename), buffer);
@@ -42,6 +42,13 @@ Result load_png(string filename, sf2d_texture** texture) {
 	void* ob = 0;
 	int x = 0;
 	int y = 0;
+
+	if(safe){
+		stbi_info_from_memory((const unsigned char*)&buffer[0], buffer.size(), &x, &y, 0);
+
+		if(x == 0 || x > 412 || y == 0 || y > 482)
+			return -1;
+	}
 
 	try {
 		ob = stbi_load_from_memory((const unsigned char*)&buffer[0], buffer.size(), &x, &y, 0, 4);
@@ -63,10 +70,17 @@ Result load_png(string filename, sf2d_texture** texture) {
 	return 0;
 }
 
-Result load_png_mem(vector<char>& data, sf2d_texture** texture) {
+Result load_png_mem(vector<char>& data, sf2d_texture** texture, bool safe) {
 	void* ob = 0;
 	int x = 0;
 	int y = 0;
+
+	if(safe){
+		stbi_info_from_memory((const unsigned char*)&data[0], data.size(), &x, &y, 0);
+
+		if(x == 0 || x > 412 || y == 0 || y > 482)
+			return -1;
+	}
 
 	try {
 		ob = stbi_load_from_memory((const unsigned char*)&data[0], data.size(), &x, &y, 0, 4);
@@ -312,7 +326,7 @@ void UI_start() {
 	TEXTURE.ui = {NULL, true};
 
 	Result res;
-	res = load_png("romfs:/ui.png", &TEXTURE.ui.tx);
+	res = load_png("romfs:/ui.png", &TEXTURE.ui.tx, false);
 
 	if(res)
 		throwError("Failed to load textures.");

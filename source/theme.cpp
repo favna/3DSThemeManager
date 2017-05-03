@@ -105,23 +105,23 @@ void scanThemes(void*){
 }
 
 void loadPreview(void* id){
-	if(!themes[(int)id].isZip){
-		while (true){
+	if(!themes[(int)id].isZip){printf("%s:%d\n", __FILE__, __LINE__);
+		while (true){printf("%s:%d\n", __FILE__, __LINE__);
 			if(!LightLock_TryLock(&themes[(int)id].lock))
 				break;
-
+printf("%s:%d\n", __FILE__, __LINE__);
 			svcSleepThread(1);
-		}
-
-		sf2d_texture* tmp;
-		Result res = load_png((string("/Themes/") + themes[(int)id].fileName + "/Preview.png").c_str(), &tmp);
-
-		if(!res){
-			themes[(int)id].preview = tmp;
-			C3D_TexSetFilter(&themes[(int)id].preview->tex, GPU_LINEAR, GPU_LINEAR);
+		}printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+		sf2d_texture* tmp;printf("%s:%d\n", __FILE__, __LINE__);
+		Result res = load_png((string("/Themes/") + themes[(int)id].fileName + "/Preview.png").c_str(), &tmp);printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+		if(!res){printf("%s:%d\n", __FILE__, __LINE__);
+			themes[(int)id].preview = tmp;printf("%s:%d\n", __FILE__, __LINE__);
+			C3D_TexSetFilter(&themes[(int)id].preview->tex, GPU_LINEAR, GPU_LINEAR);printf("%s:%d\n", __FILE__, __LINE__);
 		} else
 			themes[(int)id].hasPreview = false;
-
+printf("%s:%d\n", __FILE__, __LINE__);
 		LightLock_Unlock(&themes[(int)id].lock);
 	} else {
 		// open zip
@@ -183,89 +183,89 @@ void loadPreview(void* id){
 void loadThemeInfo(void* id){
 	themes[(int)id].infoIsloaded = true;
 
-	if(!themes[(int)id].isZip){
-		while (true){
+	if(!themes[(int)id].isZip){printf("%s:%d\n", __FILE__, __LINE__);
+		while (true){printf("%s:%d\n", __FILE__, __LINE__);
 			if(!LightLock_TryLock(&themes[(int)id].lock))
 				break;
 
 			svcSleepThread(1);
 		}
-
-		ifstream smdhFile("/Themes/" + themes[(int)id].fileName + "/info.smdh", ios::in | ios::binary);
-		if(smdhFile.is_open()){
-			char* buffer = new char[0x520];
-			smdhFile.read(buffer, 0x520);
-
-			int offset = 0x8;
-
-			string tmpTitle = "";
-			string tmpDescription = "";
-			string tmpAuthor = "";
-
-			for (size_t i = 0; i < 128; i++){
+printf("%s:%d\n", __FILE__, __LINE__);
+		ifstream smdhFile("/Themes/" + themes[(int)id].fileName + "/info.smdh", ios::in | ios::binary);printf("%s:%d\n", __FILE__, __LINE__);
+		if(smdhFile.is_open()){printf("%s:%d\n", __FILE__, __LINE__);
+			char* buffer = new char[0x520];printf("%s:%d\n", __FILE__, __LINE__);
+			smdhFile.read(buffer, 0x520);printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			int offset = 0x8;printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			string tmpTitle = "";printf("%s:%d\n", __FILE__, __LINE__);
+			string tmpDescription = "";printf("%s:%d\n", __FILE__, __LINE__);
+			string tmpAuthor = "";printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			for (size_t i = 0; i < 128; i++){printf("%s:%d\n", __FILE__, __LINE__);
 				if(buffer[offset + i] == '\00')
 					break;
-
-				tmpTitle += buffer[offset + i];
-				offset++;
-			}
-
-			offset = 0x8 + 128;
-
-			for (size_t i = 0; i < 256; i++){
+printf("%s:%d\n", __FILE__, __LINE__);
+				tmpTitle += buffer[offset + i];printf("%s:%d\n", __FILE__, __LINE__);
+				offset++;printf("%s:%d\n", __FILE__, __LINE__);
+			}printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			offset = 0x8 + 128;printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			for (size_t i = 0; i < 256; i++){printf("%s:%d\n", __FILE__, __LINE__);
+				if(buffer[offset + i] == '\00')printf("%s:%d\n", __FILE__, __LINE__);
+					break;
+printf("%s:%d\n", __FILE__, __LINE__);
+				tmpDescription += buffer[offset + i];printf("%s:%d\n", __FILE__, __LINE__);
+				offset++;printf("%s:%d\n", __FILE__, __LINE__);
+			}printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			offset = 0x8 + 128 + 256;printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			for (size_t i = 0; i < 128; i++){printf("%s:%d\n", __FILE__, __LINE__);
 				if(buffer[offset + i] == '\00')
 					break;
-
-				tmpDescription += buffer[offset + i];
-				offset++;
-			}
-
-			offset = 0x8 + 128 + 256;
-
-			for (size_t i = 0; i < 128; i++){
-				if(buffer[offset + i] == '\00')
-					break;
-
-				tmpAuthor += buffer[offset + i];
-				offset++;
-			}
-
+printf("%s:%d\n", __FILE__, __LINE__);
+				tmpAuthor += buffer[offset + i];printf("%s:%d\n", __FILE__, __LINE__);
+				offset++;printf("%s:%d\n", __FILE__, __LINE__);
+			}printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
 			//if(tmpTitle.find_first_not_of('\00') != string::npos)
 			if(tmpTitle.size() != 0)
 				themes[(int)id].title = tmpTitle;
-
+printf("%s:%d\n", __FILE__, __LINE__);
 			if(tmpDescription.size() != 0)
 				themes[(int)id].description = tmpDescription;
-
+printf("%s:%d\n", __FILE__, __LINE__);
 			if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
 				themes[(int)id].author = tmpAuthor;
-
+printf("%s:%d\n", __FILE__, __LINE__);
 			smdhFile.seekg(0x24C0);
 			char* iconBuf = new char[0x1200];
 			smdhFile.read(iconBuf, 0x1200);
-
+printf("%s:%d\n", __FILE__, __LINE__);
 			// detects default icons
-			if(iconBuf[0] != '\x9D' && iconBuf[1] != '\x04' && iconBuf[0] != '\xBF' && iconBuf[1] != '\x0D'){
-				themes[(int)id].icon = sf2d_create_texture(48, 48, TEXFMT_RGB565, SF2D_PLACE_RAM);
-				u16* dst = (u16*)(themes[(int)id].icon->tex.data + 64 * 8 * 2 * sizeof(u16));
-				u16* src = (u16*)(iconBuf);
-				for (u8 j = 0; j < 48; j += 8){
-					memcpy(dst, src, 48 * 8 * sizeof(u16));
-					src += 48 * 8;
-					dst += 64 * 8;
-				}
-			}
-
-			delete[] buffer;
-			delete[] iconBuf;
-		}
-
-		smdhFile.close();
-
-		LightLock_Unlock(&themes[(int)id].lock);
-
-		loadPreview(id);
-
+			if(iconBuf[0] != '\x9D' && iconBuf[1] != '\x04' && iconBuf[0] != '\xBF' && iconBuf[1] != '\x0D'){printf("%s:%d\n", __FILE__, __LINE__);
+				themes[(int)id].icon = sf2d_create_texture(48, 48, TEXFMT_RGB565, SF2D_PLACE_RAM);printf("%s:%d\n", __FILE__, __LINE__);
+				u16* dst = (u16*)(themes[(int)id].icon->tex.data + 64 * 8 * 2 * sizeof(u16));printf("%s:%d\n", __FILE__, __LINE__);
+				u16* src = (u16*)(iconBuf);printf("%s:%d\n", __FILE__, __LINE__);
+				for (u8 j = 0; j < 48; j += 8){printf("%s:%d\n", __FILE__, __LINE__);
+					memcpy(dst, src, 48 * 8 * sizeof(u16));printf("%s:%d\n", __FILE__, __LINE__);
+					src += 48 * 8;printf("%s:%d\n", __FILE__, __LINE__);
+					dst += 64 * 8;printf("%s:%d\n", __FILE__, __LINE__);
+				}printf("%s:%d\n", __FILE__, __LINE__);
+			}printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+			delete[] buffer;printf("%s:%d\n", __FILE__, __LINE__);
+			delete[] iconBuf;printf("%s:%d\n", __FILE__, __LINE__);
+		}printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+		smdhFile.close();printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+		LightLock_Unlock(&themes[(int)id].lock);printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
+		loadPreview(id);printf("%s:%d\n", __FILE__, __LINE__);
+printf("%s:%d\n", __FILE__, __LINE__);
 		themes[(int)id].infoIsFullyLoaded = true;
 	} else {
 		while (true){
