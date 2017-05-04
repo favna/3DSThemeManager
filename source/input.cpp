@@ -3,9 +3,25 @@
 
 #include "input.h"
 
+touchPosition initialTouch;
+touchPosition lastTouch;
+
 int XHeldLength = 0;
 
-void INPUT_handle() {
+bool checkTouch(int ax1, int ay1, int ax2, int ay2) {
+	int ix = initialTouch.px;
+	int iy = initialTouch.py;
+	int lx = lastTouch.px;
+	int ly = lastTouch.py;
+
+	if(ax1 <= ix && ix <= ax2 + ax1 && ay1 <= iy && iy <= ay2 + ay1 &&
+	   ax1 <= lx && lx <= ax2 + ax1 && ay1 <= ly && ly <= ay2 + ay1)
+		return true;
+
+	return false;
+}
+
+void INPUT_handle(){
 	hidScanInput();
 
 	if(isError || isInstalling || themes.size() == 0 || !themesScanned)
@@ -18,6 +34,11 @@ void INPUT_handle() {
 	hidTouchRead(&touchPos);
 	circlePosition circlePos;
 	hidCircleRead(&circlePos);
+
+	if(kDown & KEY_TOUCH) {
+		lastTouch = touchPos;
+		initialTouch = touchPos;
+	}
 
 	if(update.size() != 0){
 		if(kDown & KEY_A){
@@ -37,6 +58,15 @@ void INPUT_handle() {
 			deleteTheme();
 		else if(kUp & KEY_B)
 			deletePrompt = false;
+
+		return;
+	}
+
+	if(dumpPrompt){
+		if(kUp & KEY_A)
+			dumpTheme();
+		else if(kUp & KEY_B)
+			dumpPrompt = false;
 
 		return;
 	}
@@ -76,10 +106,18 @@ void INPUT_handle() {
 				else
 					queueTask(installTheme, (void*)false);
 			}
+
+			if(kUp & KEY_TOUCH){
+				if(checkTouch(320 - 3 - 24, 3, 24, 24))
+					dumpPrompt = true;
+			}
 		}
 
 		if(kUp & KEY_X)
 			if((previewX == 8.f || previewX == 0.f) && themes[currentSelectedItem].hasPreview)
 				toggleFullscreen();
 	}
+
+	if(kHeld & KEY_TOUCH)
+		lastTouch = touchPos;
 }

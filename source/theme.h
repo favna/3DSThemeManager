@@ -32,6 +32,7 @@ extern bool isInstalling;
 extern string installProgress;
 
 extern bool deletePrompt;
+extern bool dumpPrompt;
 
 void scanThemes(void*);
 void loadThemeInfo(void*);
@@ -39,5 +40,6 @@ void checkInfosToBeLoaded(int);
 void loadPreview(void*);
 void installTheme(void*);
 void deleteTheme();
+void dumpTheme();
 
 void toggleBGM();

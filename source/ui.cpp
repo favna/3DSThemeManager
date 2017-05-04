@@ -219,6 +219,10 @@ void drawMain(gfxScreen_t screen) {
 				sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
 				sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, "Are you sure you want to") / 2, 56, 0xFFFFFFFF, 24, "Are you sure you want to");
 				sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, "delete this theme?") / 2, 56 + 26, 0xFFFFFFFF, 24, "delete this theme?");
+			} else if(dumpPrompt){
+				sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
+				sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, "Dump installed theme?") / 2, 56 + 26, 0xFFFFFFFF, 24, "Dump installed theme?");
+				sftd_draw_text(FONT.normal, 200 - sftd_get_text_width(FONT.normal, 13, "Please don't submit official themes to 3DSThem.es!") / 2, 56 + 26*2, 0x880000FF, 13, "Please don't submit official themes to 3DSThem.es!");
 			} else if(currentPlayingAudio || audioIsPlaying){
 				sf2d_draw_rectangle(0, 0, 400, 240, 0x88000000);
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 88, 91, 400, 328, 223, 92);
@@ -267,8 +271,8 @@ void drawMain(gfxScreen_t screen) {
 		// bar
 		sf2d_draw_rectangle(0, 0, 320, 30, 0xFFAB47BC);
 
-		// icons
-		//sf2d_draw_texture_part(TEXTURE.ui.tx, 264, 0, 74, 0, 56, 30);
+		// dump theme icon
+		sf2d_draw_texture_part(TEXTURE.ui.tx, 320 - 3 - 24, 3, 146, 0, 24, 24);
 
 		// preview (fullscreen)
 		if(themes.size() != 0 && previewX != 8.f && themes[currentSelectedItem].preview && !LightLock_TryLock(&themes[currentSelectedItem].lock)){
@@ -290,7 +294,7 @@ void drawMain(gfxScreen_t screen) {
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 142, 669, 270, 100, 40);
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 142 + 25 + 6, 415, 0, 15, 15);
 			sftd_draw_text(FONT.light, 110 + 100 / 2 - sftd_get_text_width(FONT.light, 24, "No") / 2, 147, 0xFFFFFFFF, 24, "No");
-		} else if(deletePrompt){
+		} else if(deletePrompt || dumpPrompt){
 			sf2d_draw_rectangle(0, 0, 320, 240, 0xEE000000);
 
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 98 - 30, 669, 270, 100, 40);
@@ -355,7 +359,7 @@ void UI_cleanup() {
 }
 
 void UI_update() {
-	if(isError) {
+	if(isError && STATE.debug != GFX_TOP){
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 
 		for (size_t i = 0; i < 240; i++) {

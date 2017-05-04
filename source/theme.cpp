@@ -9,6 +9,7 @@ bool isInstalling = false;
 string installProgress = "";
 
 bool deletePrompt = false;
+bool dumpPrompt = false;
 
 void scanThemes(void*){
 	Result ret;
@@ -675,6 +676,89 @@ void deleteTheme(){
 	themes.erase(themes.begin() + currentSelectedItem);
 	selectTheme(max(0, currentSelectedItem - 1));
 	deletePrompt = false;
+}
+
+void dumpTheme(){
+	string num;
+	for (size_t i = 0; i < 100; i++){
+		char str[3];
+		snprintf(str, 3, "%02d", i);
+		if(!FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, (string("/Themes/Themely_Dump") + str).c_str()), FS_ATTRIBUTE_DIRECTORY)){
+			num = string(str);
+			break;
+		}
+	}
+
+	if(num.size() == 0)
+		return throwError("Ran out of numbers for the dump name. Clean that shit");
+
+	u8* themeManageBin_buf = new u8[0x800];
+	Handle themeManageBin_handle;
+
+	u8* bodyCacheBin_buf;
+	u64 bodyCacheBin_size;
+	Handle bodyCacheBin_handle;
+
+	u8* bgmCacheBin_buf;
+	u64 bgmCacheBin_size;
+	Handle bgmCacheBin_handle;
+
+	Handle bodyOutput_handle;
+	Handle bgmOutput_handle;
+
+	// get size of body and bgm
+	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
+		return throwError("Failed to open ThemeManage.bin");
+
+	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
+		return throwError("Failed to read ThemeManage.bin");
+
+	bodyCacheBin_size = (u64)(*((u32*)&themeManageBin_buf[0x08]));
+	bgmCacheBin_size = (u64)(*((u32*)&themeManageBin_buf[0x0C]));
+
+	delete[] themeManageBin_buf;
+	FSFILE_Close(themeManageBin_handle);
+
+	// get body
+	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_READ, 0))
+		return throwError("Failed to open BodyCache.bin. Perhaps you don't have a theme set?");
+
+	bodyCacheBin_buf = new u8[bodyCacheBin_size];
+	if(FSFILE_Read(bodyCacheBin_handle, nullptr, 0, bodyCacheBin_buf, (u32)bodyCacheBin_size))
+		return throwError("Failed to read BodyCache.bin. Perhaps you don't have a theme set?");
+
+	if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), 0, (u64)bodyCacheBin_size))
+		return throwError("Failed to create body_LZ.bin");
+
+	if(FSUSER_OpenFile(&bodyOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), FS_OPEN_WRITE, 0))
+		return throwError("Failed to open body_LZ.bin");
+
+	if(FSFILE_Write(bodyOutput_handle, nullptr, 0, bodyCacheBin_buf, bodyCacheBin_size, FS_WRITE_FLUSH))
+		return throwError("Failed to write to body_LZ.bin");
+
+	delete[] bodyCacheBin_buf;
+
+	// get music
+	if(!FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_READ, 0)){
+		bgmCacheBin_buf = new u8[bgmCacheBin_size];
+		if(!FSFILE_Read(bgmCacheBin_handle, nullptr, 0, bgmCacheBin_buf, (u32)bgmCacheBin_size)){
+			if(!FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/bgm.bcstm").c_str()), 0, (u64)bgmCacheBin_size)){
+				if(!FSUSER_OpenFile(&bgmOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/bgm.bcstm").c_str()), FS_OPEN_WRITE | FS_OPEN_CREATE, 0)){
+					FSFILE_Write(bgmOutput_handle, nullptr, 0, bgmCacheBin_buf, bgmCacheBin_size, FS_WRITE_FLUSH);
+
+					FSFILE_Close(bgmOutput_handle);
+				}
+			}
+		}
+
+		delete[] bgmCacheBin_buf;
+		FSFILE_Close(bgmCacheBin_handle);
+	}
+
+	FSFILE_Close(bodyCacheBin_handle);
+	FSFILE_Close(bodyOutput_handle);
+
+	dumpPrompt = false;
 }
 
 void toggleBGM(){
