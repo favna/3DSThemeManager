@@ -522,13 +522,13 @@ void installTheme(void* noBGM){
 	Handle saveDataDat_handle;
 
 	if(FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0))
-		return throwError("Failed to open SaveData.dat. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to open SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	FSFILE_GetSize(saveDataDat_handle, &saveDataDat_size);
 
 	saveDataDat_buf = new u8[saveDataDat_size];
 	if(FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size))
-		return throwError("Failed to read SaveData.dat. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to read SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	installProgress += "\nWriting to SaveData.dat...";
 
@@ -546,7 +546,7 @@ void installTheme(void* noBGM){
 		saveDataDat_buf[0x13b8] = 0xff; // theme index
 
 		if(FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH))
-			return throwError("Failed to write to SaveData.dat. Try selecting one of the default color themes on the home menu settings");
+			return throwError("Failed to write to SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 	}
 
 	free(saveDataDat_buf);
@@ -558,15 +558,15 @@ void installTheme(void* noBGM){
 	Handle bodyCacheBin_handle;
 	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"));
 	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)bodyData.size()))
-	//	return throwError("Failed to create BodyCache.bin. Try selecting one of the default color themes on the home menu settings");
+	//	return throwError("Failed to create BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open BodyCache.bin. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to open BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	installProgress += "\nWriting to BodyCache.bin...";
 
 	if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0, &bodyData[0], (u64)bodyData.size(), FS_WRITE_FLUSH))
-		return throwError("Failed to write to BodyCache.bin. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to write to BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	FSFILE_Close(bodyCacheBin_handle);
 
@@ -580,10 +580,10 @@ void installTheme(void* noBGM){
 	//else
 	//	ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008);
 	//if(ret)
-	//	return throwError("Failed to create BgmCache.bin. Try selecting one of the default color themes on the home menu settings");
+	//	return throwError("Failed to create BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open BgmCache.bin. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to open BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	installProgress += "\nWriting to BgmCache.bin...";
 
@@ -595,7 +595,7 @@ void installTheme(void* noBGM){
 		free(empty);
 	}
 	if(ret)
-		return throwError("Failed to write to BgmCache.bin. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to write to BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	FSFILE_Close(bgmCacheBin_handle);
 
@@ -607,13 +607,13 @@ void installTheme(void* noBGM){
 
 	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"));
 	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
-	//	return throwError("Failed to create ThemeManage.bin. Try selecting one of the default color themes on the home menu settings");
+	//	return throwError("Failed to create ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open ThemeManage.bin. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to open ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
-		return throwError("Failed to read ThemeManage.bin. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to read ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	installProgress += "\nWriting to ThemeManage.bin...";
 
@@ -658,7 +658,7 @@ void installTheme(void* noBGM){
 	//memcpy(themeManageBin_buf, thememanage, 0x20);
 
 	if(FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH))
-		return throwError("Failed to write to ThemeManage.bin. Try selecting one of the default color themes on the home menu settings");
+		return throwError("Failed to write to ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	FSFILE_Close(themeManageBin_handle);
 
