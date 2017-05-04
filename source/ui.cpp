@@ -179,7 +179,7 @@ void drawMain(gfxScreen_t screen) {
 				// fullscreen preview button & delete
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219 - BGMBtn*17, 430, 0, 15, 15);
 				sftd_draw_text(FONT.small, 400 - sftd_get_text_width(FONT.small, 11, "[hold] delete") - 8, 220 - BGMBtn*17, 0xFFFFFFFF, 11, "[hold] delete");
-				if(fullscreenBtn)
+				if(themes[currentSelectedItem].preview)
 					sftd_draw_text(FONT.small, 196, 220 - BGMBtn*17, 0xFFFFFFFF, 11, "Fullscreen preview");
 
 				// bgm preview button
