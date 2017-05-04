@@ -7,10 +7,10 @@ appConfig CONFIG = {
 	"en"
 };
 
-void CONFIG_load() {
+void CONFIG_load(){
 	// TODO: load config
 }
 
-void CONFIG_save() {
+void CONFIG_save(){
 	// TODO: save config
 }

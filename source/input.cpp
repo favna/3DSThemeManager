@@ -8,7 +8,7 @@ touchPosition lastTouch;
 
 int XHeldLength = 0;
 
-bool checkTouch(int ax1, int ay1, int ax2, int ay2) {
+bool checkTouch(int ax1, int ay1, int ax2, int ay2){
 	int ix = initialTouch.px;
 	int iy = initialTouch.py;
 	int lx = lastTouch.px;
@@ -35,7 +35,7 @@ void INPUT_handle(){
 	circlePosition circlePos;
 	hidCircleRead(&circlePos);
 
-	if(kDown & KEY_TOUCH) {
+	if(kDown & KEY_TOUCH){
 		lastTouch = touchPos;
 		initialTouch = touchPos;
 	}

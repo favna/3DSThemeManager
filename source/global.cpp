@@ -163,7 +163,7 @@ size_t read_file_to_mem(char** data, const char* path, u32 offset){
 
 int fileToVector(string path, vector<char>& vector){
 	ifstream file(path, ios::in | ios::binary);
-	if(file.is_open()) {
+	if(file.is_open()){
 		file.seekg(0, ios_base::end);
 		streampos fileSize = file.tellg();
 		vector.resize(fileSize);

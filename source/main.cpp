@@ -12,7 +12,7 @@
 #include "audio.h"
 
 // Initiates services, starts up modules
-void start() {
+void start(){
 	srvPublishToSubscriber(0x202, 0);
 
 	Result ret;
@@ -76,12 +76,12 @@ void start() {
 }
 
 // Closes services, modules, etc.
-void cleanup() {
+void cleanup(){
 	// clean task queue; wait for threads
 	closing = true;
 
 	cleanTaskQueue();
-	while (true) {
+	while (true){
 		if(threadsRunning == 0)
 			break;
 
@@ -113,7 +113,7 @@ void cleanup() {
 		svcSleepThread(20e6);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv){
 	start();
 
 	queueTask(checkForUpdate, 0);

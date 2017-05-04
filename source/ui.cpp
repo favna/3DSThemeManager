@@ -34,7 +34,7 @@ u32 getLoadingAnim(){
 	return rainbow[loadingAnimTimer];
 }
 
-Result load_png(string filename, sf2d_texture** texture, bool safe) {
+Result load_png(string filename, sf2d_texture** texture, bool safe){
 	// thx MarcusD
 	vector<char> buffer;
 	fileToVector(string(filename), buffer);
@@ -52,7 +52,7 @@ Result load_png(string filename, sf2d_texture** texture, bool safe) {
 
 	try {
 		ob = stbi_load_from_memory((const unsigned char*)&buffer[0], buffer.size(), &x, &y, 0, 4);
-	} catch (...) {
+	} catch (...){
 		return -1;
 	}
 
@@ -70,7 +70,7 @@ Result load_png(string filename, sf2d_texture** texture, bool safe) {
 	return 0;
 }
 
-Result load_png_mem(vector<char>& data, sf2d_texture** texture, bool safe) {
+Result load_png_mem(vector<char>& data, sf2d_texture** texture, bool safe){
 	void* ob = 0;
 	int x = 0;
 	int y = 0;
@@ -84,7 +84,7 @@ Result load_png_mem(vector<char>& data, sf2d_texture** texture, bool safe) {
 
 	try {
 		ob = stbi_load_from_memory((const unsigned char*)&data[0], data.size(), &x, &y, 0, 4);
-	} catch (...) {
+	} catch (...){
 		return -1;
 	}
 
@@ -102,7 +102,7 @@ Result load_png_mem(vector<char>& data, sf2d_texture** texture, bool safe) {
 	return 0;
 }
 
-void drawMain(gfxScreen_t screen) {
+void drawMain(gfxScreen_t screen){
 	if(screen == GFX_TOP){
 		// bar
 		sf2d_draw_rectangle(0, 0, 400, 30, 0xFFAB47BC);
@@ -190,7 +190,7 @@ void drawMain(gfxScreen_t screen) {
 
 				// preview
 				if(themes[currentSelectedItem].hasPreview && themes[currentSelectedItem].preview){
-					if(previewX == 8.f) {
+					if(previewX == 8.f){
 						previewW = (float)(163.f/themes[currentSelectedItem].preview->width);
 						previewH = (float)(196.f/themes[currentSelectedItem].preview->height);
 					}
@@ -227,7 +227,7 @@ void drawMain(gfxScreen_t screen) {
 				sf2d_draw_rectangle(0, 0, 400, 240, 0x88000000);
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 88, 91, 400, 328, 223, 92);
 			}
-		} else if(themes.size() == 0) {
+		} else if(themes.size() == 0){
 			string s = "No themes found! :(";
 			sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, s.c_str()) / 2, 38, 0xFFFFFFFF, 24, s.c_str());
 			s = "Go to 3DSThem.es on your computer, download some themes,";
@@ -309,7 +309,7 @@ void drawMain(gfxScreen_t screen) {
 	}
 }
 
-void drawLoading(gfxScreen_t screen) {
+void drawLoading(gfxScreen_t screen){
 	if(screen == GFX_TOP){
 		sf2d_draw_rectangle(0, 0, 400, 240, 0xFFAB47BC);
 		sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 0, 400, 30, 400, 240);
@@ -320,7 +320,7 @@ void drawLoading(gfxScreen_t screen) {
 	}
 }
 
-void drawScreen(gfxScreen_t screen) {
+void drawScreen(gfxScreen_t screen){
 	if(!themesScanned)
 		drawLoading(screen);
 	else
@@ -329,7 +329,7 @@ void drawScreen(gfxScreen_t screen) {
 
 // ---
 
-void UI_start() {
+void UI_start(){
 	FONT.normal = sftd_load_font_file("romfs:/RobotoCondensed-Regular.ttf");
 	FONT.small = sftd_load_font_file("romfs:/RobotoCondensed-Regular.ttf");
 	FONT.light = sftd_load_font_file("romfs:/RobotoCondensed-Light.ttf");
@@ -351,18 +351,18 @@ void UI_start() {
 	UI_update();
 }
 
-void UI_cleanup() {
+void UI_cleanup(){
 	sftd_free_font(FONT.normal);
 
 	TEXTURE.ui.loaded = false;
 	sf2d_free_texture(TEXTURE.ui.tx);
 }
 
-void UI_update() {
+void UI_update(){
 	if(isError && STATE.debug != GFX_TOP){
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 
-		for (size_t i = 0; i < 240; i++) {
+		for (size_t i = 0; i < 240; i++){
 			sf2d_draw_rectangle(0, i, 400, 1, RGBA8(i, 0, 0, 255));
 		}
 
@@ -392,7 +392,7 @@ void UI_update() {
 	sf2d_swapbuffers();
 }
 
-void selectTheme(int id) {
+void selectTheme(int id){
 	if(currentSelectedItem == id || id < 0 || id >= themes.size())
 		return;
 
@@ -431,7 +431,7 @@ int startAnimation(float* valueToChange, float end, float duration){
 }
 
 void runAnimations(){
-	for (size_t i = 0; i < animationList.size(); i++) {
+	for (size_t i = 0; i < animationList.size(); i++){
 		if(animationList[i].isActive){
 			*animationList[i].valueToChange = easeOutQuint(timer - animationList[i].timeStarted, animationList[i].start, animationList[i].end - animationList[i].start, animationList[i].duration);
 

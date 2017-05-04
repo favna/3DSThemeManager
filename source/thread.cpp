@@ -18,7 +18,7 @@ Thread createThread(ThreadFunc entrypoint, void* arg){
 	return thread;
 }
 
-void queueTask(ThreadFunc entrypoint, void* arg) {
+void queueTask(ThreadFunc entrypoint, void* arg){
 	Task task = {entrypoint, arg};
 	while(true){
 		if(!LightLock_TryLock(&taskQueueLock))
@@ -31,8 +31,8 @@ void queueTask(ThreadFunc entrypoint, void* arg) {
 	LightLock_Unlock(&taskQueueLock);
 }
 
-void worker(void* arg) {
-	while (!closing) {
+void worker(void* arg){
+	while (!closing){
 		while(true){
 			if(!LightLock_TryLock(&taskQueueLock))
 				break;
@@ -43,7 +43,7 @@ void worker(void* arg) {
 		Task task;
 		bool taskReady = false;
 
-		if(!taskQueue.empty()) {
+		if(!taskQueue.empty()){
 			task = taskQueue.front();
 			taskQueue.erase(taskQueue.begin());
 
@@ -62,15 +62,15 @@ void worker(void* arg) {
 	threadExit(0);
 }
 
-void startWorkers() {
+void startWorkers(){
 	LightLock_Init(&taskQueueLock);
 
-	for (size_t i = 0; i < 2; i++) {
+	for (size_t i = 0; i < 2; i++){
 		THREADS[i] = createThread(worker, (void*)((i+1)*100));
 	}
 }
 
-void cleanTaskQueue() {
+void cleanTaskQueue(){
 	taskQueue.clear();
 }
 

@@ -9,7 +9,7 @@ Audio* currentPlayingAudio;
 bool audioIsPlaying = false;
 
 string ov_error_to_string(int err){
-	switch (err) {
+	switch (err){
 		case OV_EREAD:
 			return "A read from media returned an error";
 		case OV_ENOTVORBIS:
@@ -32,7 +32,7 @@ void ogg_play(){
 		read:
 		currentPlayingAudio->status = ov_read(&currentPlayingAudio->vf, (char*)currentPlayingAudio->waveBuf[currentPlayingAudio->block].data_vaddr + currentPlayingAudio->blockPos, size, &currentPlayingAudio->section);
 
-		if(currentPlayingAudio->status <= 0) {
+		if(currentPlayingAudio->status <= 0){
 			ov_clear(&currentPlayingAudio->vf);
 
 			if(currentPlayingAudio->status < 0)
@@ -43,7 +43,7 @@ void ogg_play(){
 			}
 		} else {
 			currentPlayingAudio->blockPos += currentPlayingAudio->status;
-			if (currentPlayingAudio->status == size) {
+			if (currentPlayingAudio->status == size){
 				currentPlayingAudio->blockPos = 0;
 				ndspChnWaveBufAdd(0, &currentPlayingAudio->waveBuf[currentPlayingAudio->block]);
 				currentPlayingAudio->block = !currentPlayingAudio->block;
