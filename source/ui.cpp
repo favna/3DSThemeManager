@@ -364,7 +364,6 @@ void UI_update() {
 
 		sftd_draw_text(FONT.normal, 0, 0, 0xFFFFFFFF, 13, (string("An error has occurred. You have version ") + VERSION + ".").c_str());
 		sftd_draw_text(FONT.normal, 0, 224, 0xFFFFFFFF, 13, "Press START to quit.");
-		sftd_draw_text(FONT.normal, 292, 224, 0xFFFFFFFF, 13, "support@3dsthem.es");
 		sftd_draw_text_wrap(FONT.normal, 0, 16, 0xFFFFFFFF, 13, 400, error.c_str());
 		sf2d_end_frame();
 		sf2d_swapbuffers();
