@@ -881,6 +881,8 @@ void installShuffle(void*){
 
 	FSFILE_Close(themeManageBin_handle);
 
+	exitShuffleMode();
+
 	isInstalling = false;
 	installProgress = "";
 }
