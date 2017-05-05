@@ -166,7 +166,8 @@ int fileToVector(string path, vector<char>& vector){
 	if(file.is_open()){
 		file.seekg(0, ios_base::end);
 		streampos fileSize = file.tellg();
-		vector.resize(fileSize);
+		if(fileSize > vector.size())
+			vector.resize(fileSize);
 
 		file.seekg(0, ios_base::beg);
 		file.read(&vector[0], fileSize);

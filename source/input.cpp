@@ -71,6 +71,9 @@ void INPUT_handle(){
 		return;
 	}
 
+	if(kUp & KEY_B && shuffleMode)
+		exitShuffleMode();
+
 	if(themesScanned){
 		if(previewX == 8.f){
 			if(kDown & KEY_Y)
@@ -100,16 +103,53 @@ void INPUT_handle(){
 				selectTheme(min((int)themes.size() - 1, currentSelectedItem + 5));
 
 			if(kUp & KEY_A){
-				isInstalling = true;
-				if(kHeld & KEY_R)
-					queueTask(installTheme, (void*)true);
-				else
-					queueTask(installTheme, (void*)false);
+				if(shuffleMode){
+					int selected = 0;
+					for (size_t i = 0; i < themes.size(); i++)
+						if(themes[i].toShuffle)
+							selected++;
+
+					if(!themes[currentSelectedItem].toShuffle && selected < 10){
+						themes[currentSelectedItem].toShuffle = true;
+
+						if(kHeld & KEY_R)
+							themes[currentSelectedItem].shuffleNoBGM = true;
+					} else {
+						themes[currentSelectedItem].toShuffle = false;
+						themes[currentSelectedItem].shuffleNoBGM = false;
+					}
+				} else {
+					isInstalling = true;
+					if(kHeld & KEY_R)
+						queueTask(installTheme, (void*)true);
+					else
+						queueTask(installTheme, (void*)false);
+				}
 			}
 
 			if(kUp & KEY_TOUCH){
-				if(checkTouch(320 - 3 - 24, 3, 24, 24))
-					dumpPrompt = true;
+				if(shuffleMode){
+					if(checkTouch(320 - 3*2 - 24*2, 3, 24, 24)){
+						int selected = 0;
+						for (size_t i = 0; i < themes.size(); i++)
+							if(themes[i].toShuffle)
+								selected++;
+
+						if(selected > 1){
+							isInstalling = true;
+							queueTask(installShuffle, (void*)0);
+						}
+					}
+
+					if(checkTouch(320 - 3 - 24, 3, 24, 24))
+						exitShuffleMode();
+				} else {
+					if(checkTouch(320 - 3 - 24, 3, 24, 24))
+						dumpPrompt = true;
+
+					if(checkTouch(3, 3, 24, 24))
+						shuffleMode = true;
+				}
 			}
 		}
 

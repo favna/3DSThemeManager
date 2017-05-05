@@ -632,9 +632,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.5"
-     inkscape:cx="864.57667"
-     inkscape:cy="-177.69383"
+     inkscape:zoom="1"
+     inkscape:cx="835.77667"
+     inkscape:cy="-393.36993"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -3585,6 +3585,62 @@
          id="path6098-7"
          d="m 10.09,15.59 1.41,1.41 5,-5 -5,-5 -1.41,1.41 2.58,2.59 -9.67,0 0,2 9.67,0 -2.58,2.59 z M 19,3 5,3 C 3.89,3 3,3.9 3,5 l 0,4 2,0 0,-4 14,0 0,14 -14,0 0,-4 -2,0 0,4 c 0,1.1 0.89,2 2,2 l 14,0 c 1.1,0 2,-0.9 2,-2 L 21,5 C 21,3.9 20.1,3 19,3 Z"
          inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g6286-7"
+       transform="matrix(0.66666667,0,0,0.66666667,409.33327,553.45399)"
+       inkscape:export-filename="/home/erman/Desktop/MEGA/3ds_homebrew_development/projects/Themely/romfs/ui.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="7.8749971"
+         y="1007.8622"
+         x="736"
+         height="22.5"
+         width="60"
+         id="rect6280-8"
+         style="opacity:1;fill:#111111;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text6282-6"
+         y="1052.46"
+         x="722.59949"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.54127121px;line-height:125%;font-family:'Roboto Condensed';-inkscape-font-specification:'Roboto Condensed, ';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"
+         transform="scale(1.0275703,0.97316943)"><tspan
+           style="font-size:14.7706356px"
+           y="1052.46"
+           x="722.59949"
+           id="tspan6284-8"
+           sodipodi:role="line">no BGM</tspan></text>
+    </g>
+    <g
+       id="g6286-1-8"
+       transform="matrix(0.66666667,0,0,0.66666667,449.33327,553.45399)"
+       inkscape:export-filename="/home/erman/Desktop/MEGA/3ds_homebrew_development/projects/Themely/romfs/ui.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         ry="7.8749971"
+         y="1007.8622"
+         x="736"
+         height="22.5"
+         width="96"
+         id="rect6280-2-4"
+         style="opacity:1;fill:#111111;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text6282-9-3"
+         y="1055.1421"
+         x="719.72089"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.21833801px;line-height:125%;font-family:'Roboto Condensed';-inkscape-font-specification:'Roboto Condensed, ';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"
+         transform="scale(1.0314344,0.96952361)"><tspan
+           style="font-size:14.60916901px"
+           y="1055.1421"
+           x="719.72089"
+           id="tspan6284-3-1"
+           sodipodi:role="line">BGM replaced</tspan></text>
     </g>
   </g>
 </svg>

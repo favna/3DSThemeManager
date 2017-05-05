@@ -23,6 +23,9 @@ struct Theme {
 	bool hasBGM;
 	bool hasPreview;
 
+	bool toShuffle;
+	bool shuffleNoBGM;
+
 	LightLock lock;
 };
 
@@ -34,11 +37,17 @@ extern string installProgress;
 extern bool deletePrompt;
 extern bool dumpPrompt;
 
+extern bool shuffleMode;
+
 void scanThemes(void*);
 void loadThemeInfo(void*);
 void checkInfosToBeLoaded(int);
 void loadPreview(void*);
 void installTheme(void*);
+
+void installShuffle(void*);
+void exitShuffleMode();
+
 void deleteTheme();
 void dumpTheme();
 

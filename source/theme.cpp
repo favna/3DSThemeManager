@@ -11,6 +11,8 @@ string installProgress = "";
 bool deletePrompt = false;
 bool dumpPrompt = false;
 
+bool shuffleMode = false;
+
 void scanThemes(void*){
 	Result ret;
 
@@ -553,16 +555,17 @@ void installTheme(void* noBGM){
 	free(saveDataDat_buf);
 	FSFILE_Close(saveDataDat_handle);
 
-	installProgress += "\nCreating BodyCache.bin...";
-
 	// Inject body_lz.bin into BodyCache.bin
 	Handle bodyCacheBin_handle;
-	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"));
-	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)bodyData.size()))
-	//	return throwError("Failed to create BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
-	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0)){
+		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"));
+		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)0x150000))
+			return throwError("Failed to create BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+		if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0))
+			return throwError("Failed to open BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	}
 
 	installProgress += "\nWriting to BodyCache.bin...";
 
@@ -571,36 +574,31 @@ void installTheme(void* noBGM){
 
 	FSFILE_Close(bodyCacheBin_handle);
 
-	installProgress += "\nCreating BgmCache.bin...";
-
 	// Inject bgm.bcstm into BgmCache.bin
 	Handle bgmCacheBin_handle;
-	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"));
-	//if(BGMData.size() != 0)
-	//	ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, BGMData.size());
-	//else
-	//	ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008);
-	//if(ret)
-	//	return throwError("Failed to create BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
-	if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0)){
+		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"));
+		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008))
+			return throwError("Failed to create BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+		if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0))
+			return throwError("Failed to open BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	}
 
 	installProgress += "\nWriting to BgmCache.bin...";
 
 	if(BGMData.size() != 0)
 		ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, &BGMData[0], BGMData.size(), FS_WRITE_FLUSH);
 	else {
-		char* empty = new char[3371008];
+		char* empty = new char[3371008]();
 		ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, empty, (u64)3371008, FS_WRITE_FLUSH);
-		free(empty);
+		delete[] empty;
 	}
 	if(ret)
 		return throwError("Failed to write to BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
 
 	FSFILE_Close(bgmCacheBin_handle);
-
-	installProgress += "\nCreating ThemeManage.bin...";
 
 	// Update ThemeManage.bin
 	u8* themeManageBin_buf = new u8[0x800];
@@ -665,6 +663,235 @@ void installTheme(void* noBGM){
 
 	isInstalling = false;
 	installProgress = "";
+}
+
+void installShuffle(void*){
+	installProgress = "Reading body_LZ.bin\n& BGM.bcstm...";
+
+	Result ret = 0;
+	vector<vector<char>> bodyData;
+	vector<vector<char>> BGMData;
+	int themeCount = 0;
+
+	for (size_t i = 0; i < themes.size(); i++){
+		if(themes[i].toShuffle){
+			themeCount++;
+
+			// Load data
+			if(!themes[i].isZip){
+				vector<char> tmpBodyData;
+				if(fileToVector(string("/Themes/") + themes[i].fileName + "/body_LZ.bin", tmpBodyData))
+					return throwError("Failed to open body_LZ.bin file");
+
+				bodyData.push_back(tmpBodyData);
+				vector<char> tmpBGMData;
+
+				if(!themes[i].shuffleNoBGM)
+					fileToVector(string("/Themes/") + themes[i].fileName + "/bgm.bcstm", tmpBGMData);
+
+				BGMData.push_back(tmpBGMData);
+			} else {
+				unzFile zipFile = unzOpen(string("/Themes/" + string(themes[i].fileName)).c_str());
+
+				if(!zipFile)
+					return throwError("Failed to open ZIP file");
+
+				if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0))
+					return throwError("Can't find body_LZ.bin file in ZIP");
+
+				if(unzOpenCurrentFile(zipFile))
+					return throwError("Can't open body_LZ.bin file in ZIP");
+
+				vector<char> tmpBodyData;
+				ret = zippedFileToVector(zipFile, tmpBodyData);
+				if(ret)
+					return throwError(string(string("Can't read body_LZ.bin from ZIP -- error code ") + to_string(ret)).c_str());
+
+				unzCloseCurrentFile(zipFile);
+
+				bodyData.push_back(tmpBodyData);
+				vector<char> tmpBGMData;
+
+				if(!themes[i].shuffleNoBGM && !unzLocateFile(zipFile, "bgm.bcstm", 0)){
+					if(unzOpenCurrentFile(zipFile))
+						return throwError("Can't open bgm.bcstm file in ZIP");
+
+					ret = zippedFileToVector(zipFile, tmpBGMData);
+					if(ret)
+						return throwError(string(string("Can't read bgm.bcstm from ZIP -- error code ") + to_string(ret)).c_str());
+
+					unzCloseCurrentFile(zipFile);
+				}
+
+				BGMData.push_back(tmpBGMData);
+
+				unzClose(zipFile);
+			}
+		}
+	}
+
+	for (size_t i = 0; i < themeCount; i++) {
+		printf("%i: %i, %i\n", i, bodyData[i].size(), BGMData[i].size());
+	}
+
+	// Update SaveData.dat
+	u8* saveDataDat_buf;
+	u64 saveDataDat_size;
+	Handle saveDataDat_handle;
+
+	if(FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0))
+		return throwError("Failed to open SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+	FSFILE_GetSize(saveDataDat_handle, &saveDataDat_size);
+
+	saveDataDat_buf = new u8[saveDataDat_size];
+	if(FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size))
+		return throwError("Failed to read SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+	installProgress += "\nWriting to SaveData.dat...";
+
+	if(
+		!(
+			saveDataDat_buf[0x141b] == 1 &&
+			saveDataDat_buf[0x13b8] != 0 &&
+			saveDataDat_buf[0x13bc] == 0 &&
+			saveDataDat_buf[0x13bd] == 3
+		)
+	){
+		saveDataDat_buf[0x141b] = 1; // turn on shuffle
+		memset(&saveDataDat_buf[0x13b8], 0, 8); // clear the regular theme structure
+		saveDataDat_buf[0x13bd] = 3; // make it persistent
+		saveDataDat_buf[0x13b8] = 0xff; // theme index
+
+		for (size_t i = 0; i < 10; i++) {
+			memset(&saveDataDat_buf[0x13C0 + 0x8 * i], 0, 8);
+			if(themeCount > i){
+				saveDataDat_buf[0x13C0 + 0x8 * i] = i;
+				saveDataDat_buf[0x13C0 + 0x8 * i + 5] = 3;
+			}
+		}
+
+		if(FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH))
+			return throwError("Failed to write to SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	}
+
+	delete[] saveDataDat_buf;
+	FSFILE_Close(saveDataDat_handle);
+
+	// Inject body_lz.bin into BodyCache.bin
+	Handle bodyCacheBin_handle;
+	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), FS_OPEN_WRITE, 0)){
+		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"));
+		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), 0, 0x150000*10))
+			return throwError("Failed to create BodyCache_rd.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+		if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), FS_OPEN_WRITE, 0))
+			return throwError("Failed to open BodyCache_rd.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	}
+
+	installProgress += "\nWriting to BodyCache_rd.bin...";
+
+	for (size_t i = 0; i < 10; i++) {
+		if(themeCount > i){
+			if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, &bodyData[i][0], bodyData[i].size(), FS_WRITE_FLUSH))
+				return throwError("Failed to write to BodyCache_rd.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		} else {
+			char* empty = new char[0x150000]();
+			FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, empty, 0x150000, FS_WRITE_FLUSH);
+			delete[] empty;
+		}
+	}
+
+	FSFILE_Close(bodyCacheBin_handle);
+
+	installProgress += "\nWriting to BgmCache_**.bin...";
+
+	// Inject bgm.bcstm into BgmCache.bin
+	for (size_t i = 0; i < 10; i++){
+		Handle bgmCacheBin_handle;
+		if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), FS_OPEN_WRITE, 0)){
+			FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()));
+			if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), 0, (u64)3371008))
+				return throwError("Failed to create BgmCache_0" + to_string(i) + ".bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+			if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), FS_OPEN_WRITE, 0))
+				return throwError("Failed to open BgmCache_0" + to_string(i) + ".bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		}
+
+		if(themeCount > i && BGMData[i].size() != 0)
+			ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, &BGMData[i][0], BGMData[i].size(), FS_WRITE_FLUSH);
+		else {
+			char* empty = new char[3371008]();
+			ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, empty, (u64)3371008, FS_WRITE_FLUSH);
+			delete[] empty;
+		}
+
+		if(ret)
+			return throwError("Failed to write to BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+		FSFILE_Close(bgmCacheBin_handle);
+	}
+
+	// Update ThemeManage.bin
+	u8* themeManageBin_buf = new u8[0x800];
+	Handle themeManageBin_handle;
+
+	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"));
+	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
+	//	return throwError("Failed to create ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
+		return throwError("Failed to open ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
+		return throwError("Failed to read ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+	installProgress += "\nWriting to ThemeManage.bin...";
+
+	themeManageBin_buf[0x00] = 1;
+	themeManageBin_buf[0x01] = 0;
+	themeManageBin_buf[0x02] = 0;
+	themeManageBin_buf[0x03] = 0;
+	themeManageBin_buf[0x04] = 0;
+	themeManageBin_buf[0x05] = 0;
+	themeManageBin_buf[0x06] = 0;
+	themeManageBin_buf[0x07] = 0;
+	u32* bodySize_loc = (u32*)(&themeManageBin_buf[0x08]);
+	u32* BGMSize_loc = (u32*)(&themeManageBin_buf[0x0C]);
+	*bodySize_loc = (u32)0;
+	*BGMSize_loc = (u32)0;
+	themeManageBin_buf[0x10] = 0xFF;
+	themeManageBin_buf[0x14] = 0x01;
+	themeManageBin_buf[0x18] = 0xFF;
+	themeManageBin_buf[0x1D] = 0x02;
+	for (size_t i = 0; i < 10; i++) {
+		u32* bodySize_loc = (u32*)(&themeManageBin_buf[0x338 + 4 * i]);
+		u32* BGMSize_loc = (u32*)(&themeManageBin_buf[0x360 + 4 * i]);
+		if(themeCount > i){
+			*bodySize_loc = (u32)bodyData[i].size();
+			*BGMSize_loc = (u32)BGMData[i].size();
+		} else {
+			*bodySize_loc = (u32)0;
+			*BGMSize_loc = (u32)0;
+		}
+	}
+
+	if(FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH))
+		return throwError("Failed to write to ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+
+	FSFILE_Close(themeManageBin_handle);
+
+	isInstalling = false;
+	installProgress = "";
+}
+
+void exitShuffleMode(){
+	for (size_t i = 0; i < themes.size(); i++){
+		themes[i].toShuffle = false;
+		themes[i].shuffleNoBGM = false;
+	}
+
+	shuffleMode = false;
 }
 
 void deleteTheme(){
