@@ -13,7 +13,8 @@
 
 // Initiates services, starts up modules
 void start(){
-	srvPublishToSubscriber(0x202, 0);
+	if(!HOMEBREW)
+		srvPublishToSubscriber(0x202, 0);
 
 	Result ret;
 
@@ -109,7 +110,7 @@ void cleanup(){
 	fsExit();
 	cfguExit();
 
-	while(aptMainLoop())
+	while(!HOMEBREW && aptMainLoop())
 		svcSleepThread(20e6);
 }
 
