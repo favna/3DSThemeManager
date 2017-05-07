@@ -401,7 +401,7 @@ void UI_update(){
 			sf2d_draw_rectangle(0, i, 400, 1, RGBA8(i, 0, 0, 255));
 		}
 
-		sftd_draw_text(FONT.normal, 0, 0, 0xFFFFFFFF, 13, (string("An error has occurred. You have version ") + VERSION + ".").c_str());
+		sftd_draw_text(FONT.normal, 0, 0, 0xFFFFFFFF, 13, (string("Theme machine broke. You have version ") + VERSION + ".").c_str());
 		sftd_draw_text(FONT.normal, 0, 224, 0xFFFFFFFF, 13, "Press START to quit.");
 		sftd_draw_text_wrap(FONT.normal, 0, 16, 0xFFFFFFFF, 13, 400, error.c_str());
 		sf2d_end_frame();
