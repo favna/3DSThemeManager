@@ -22,4 +22,4 @@ When creating an issue for a suggestion, make you:
 - Get **very** descriptive
 
 # Pull requests
-There isn't really any guidelines for pull requests, just make sure your code is readable.
+**We don't accept pull requests.**
