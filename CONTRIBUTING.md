@@ -2,7 +2,7 @@
 First off, thanks for taking the time to contribute!
 
 The following is a set of guidelines for contributing to Themely.
-These are just guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+These are just guidelines, not rules. Use your best judgment, and feel free to propose changes to this document.
 
 # Issues
 You can report issues by creating an issue (here)[https://github.com/ErmanSayin/Themely/issues].
