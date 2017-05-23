@@ -34,5 +34,3 @@ deploy:
   file:
     - "output/3ds-arm/Themely.cia"
     - "output/3ds-arm/3ds/Themely/Themely.3dsx"
-  on:
-    repo: ErmanSayin/Themely-bleeding
