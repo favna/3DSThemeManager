@@ -13,7 +13,7 @@ make libogg;
 make install;
 make libpng freetype tremor;
 sudo -E make install;
-cd ../..;
+cd ..;
 
 cd sf2dlib/libsf2d;
 make -j4;
