@@ -258,5 +258,5 @@ void downloadThemeFromURL(void* url){
 	}
 
 	downloading = -1;
-	currentSelectedItem = themes.size() - 1;
+	selectTheme(themes.size() - 1);
 }

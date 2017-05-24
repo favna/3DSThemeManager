@@ -213,9 +213,9 @@ void drawMain(gfxScreen_t screen){
 					sf2d_draw_texture_part(TEXTURE.ui.tx, 65, 91, 400, 270, 269, 58);
 				} else if(downloading > -1){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_text_center(FONT.huge, 320/2 - 28/2, 28, 0xFFFFFFFF, 48, "Downloading...");
-					sf2d_draw_rectangle(0, 295, 400, 25, 0xFFBC47AB);
-					sftd_draw_text_center(FONT.normal, 296, 0, 0xFFFFFFFF, 13, (to_string(downloading) + "%").c_str());
+					sftd_draw_text_center(FONT.huge, 0, 240/2 - 48/2, 0xFFFFFFFF, 48, "Downloading...");
+					sf2d_draw_rectangle(0, 215, downloading * 4, 25, 0xFFBC47AB);
+					sftd_draw_text_center(FONT.normal, 0, 219, 0xFFFFFFFF, 13, (to_string(downloading) + "%").c_str());
 				} else if(update.size() != 0){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
 					sftd_draw_text(FONT.light, 28, 28, 0xFFFFFFFF, 24, "There's a new update!");
