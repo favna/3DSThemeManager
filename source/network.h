@@ -6,6 +6,9 @@
 #include "global.h"
 #include "theme.h"
 
+#include "lib/json.hpp"
+using nlohmann::json;
+
 extern string update;
 extern int downloading;
 

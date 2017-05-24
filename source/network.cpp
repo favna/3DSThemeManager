@@ -4,6 +4,7 @@
 #include "network.h"
 
 string update;
+string updateDownloadURL;
 int downloading = -1;
 
 Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* progress){
@@ -15,35 +16,46 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 	// thx https://github.com/devkitPro/3ds-examples/blob/master/network/http/source/main.c
 	Result ret = 0;
 	httpcContext context;
-	u8 *buf, *lastbuf;
+	string newurl;
+	u8* buf, *lastbuf;
 	u32 statuscode = 0,
 		contentsize = 0,
 		readsize = 0,
 		size = 0;
 
-	ret = httpcOpenContext(&context, HTTPC_METHOD_GET, url.c_str(), 1);
-	ret = httpcSetSSLOpt(&context, SSLCOPT_DisableVerify);
-	ret = httpcAddRequestHeaderField(&context, "User-Agent", (string("Themely/") + VERSION).c_str());
-	ret = httpcAddRequestHeaderField(&context, "Accept-Language", "en");
-	ret = httpcAddRequestHeaderField(&context, "Connection", "Keep-Alive");
+	do {
+		ret = httpcOpenContext(&context, HTTPC_METHOD_GET, url.c_str(), 1);
+		ret = httpcSetSSLOpt(&context, SSLCOPT_DisableVerify);
+		ret = httpcAddRequestHeaderField(&context, "User-Agent", (string("Themely/") + VERSION).c_str());
+		ret = httpcAddRequestHeaderField(&context, "Accept-Language", "en");
+		ret = httpcAddRequestHeaderField(&context, "Connection", "Keep-Alive");
 
-	if(closing) return -1;
+		if(closing) return -1;
 
-	ret = httpcBeginRequest(&context);
-	if(ret != 0){
-		httpcCloseContext(&context);
-		return ret;
-	}
+		ret = httpcBeginRequest(&context);
+		if(ret != 0){
+			httpcCloseContext(&context);
+			return ret;
+		}
 
-	if(closing) return -1;
+		if(closing) return -1;
 
-	ret = httpcGetResponseStatusCode(&context, &statuscode);
-	if(ret != 0){
-		httpcCloseContext(&context);
-		return ret;
-	}
+		ret = httpcGetResponseStatusCode(&context, &statuscode);
+		if(ret != 0){
+			httpcCloseContext(&context);
+			return ret;
+		}
 
-	if(closing) return -1;
+		if((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308)){
+			newurl.clear();
+			newurl.resize(0x1000);
+			ret = httpcGetResponseHeader(&context, "Location", &newurl[0], 0x1000);
+			url = newurl;
+			httpcCloseContext(&context);
+		}
+
+		if(closing) return -1;
+	} while ((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308));
 
 	if(statuscode != 200){
 		httpcCloseContext(&context);
@@ -125,23 +137,44 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 
 void checkForUpdate(void*){
 	vector<char> httpData;
-	Result ret = HTTPGet(httpData, "http://app.3dsthem.es/updateCheck.php");
+	bool bleeding = string(VERSION).substr(string(VERSION).find("-") + 1) == "git";
+	Result ret = HTTPGet(httpData, string("https://api.github.com/repos/ErmanSayin/Themely") + (bleeding ? "-bleeding" : "") + "/releases/latest");
 	if(ret){
 		printf("Failed to check for an update.\n");
 		return;
 	}
 
-	if(httpData.size() != 0 && httpData[0] == '!'){
-		httpData.erase(httpData.begin());
+	json latestRelease;
 
-		update = string(httpData.begin(), httpData.end());
+	try {
+		latestRelease = json::parse(httpData);
+	} catch (...) {
+		printf("Failed to check for an update.\n");
+		return;
+	}
+
+	if((!bleeding && latestRelease["tag_name"] != string("v") + VERSION) || (bleeding && latestRelease["tag_name"] != string(VERSION).substr(0, string(VERSION).find("-git")))){
+		update = latestRelease["body"];
+		update = update.substr(0, update.find("GBATemp thread:"));
+
+		for (size_t i = 0; i < latestRelease["assets"].size(); i++){
+			string name = latestRelease["assets"][i]["name"];
+			if(
+				(envIsHomebrew() && name.substr(name.find(".") + 1) == "3dsx") ||
+				(!envIsHomebrew() && name.substr(name.find(".") + 1) == "cia")
+			)
+				updateDownloadURL = latestRelease["assets"][i]["browser_download_url"];
+		}
+
+		if(updateDownloadURL.size() == 0)
+			update = "";
 	}
 }
 
 void installUpdate(){
 	if(envIsHomebrew()){
 		vector<char> threedsxData;
-		Result ret = HTTPGet(threedsxData, "http://app.3dsthem.es/release/latest/Themely.3dsx");
+		Result ret = HTTPGet(threedsxData, updateDownloadURL);
 		if(ret)
 			return throwError("Failed to download update 3DSX. If you're still having problems,\nupdate manually.");
 
@@ -160,7 +193,7 @@ void installUpdate(){
 		FSFILE_Close(threedsxHandle);
 	} else {
 		vector<char> ciaData;
-		Result ret = HTTPGet(ciaData, "http://app.3dsthem.es/release/latest/Themely.cia");
+		Result ret = HTTPGet(ciaData, updateDownloadURL);
 		if(ret)
 			return throwError("Failed to download update CIA. If you're still having problems, update through FBI -> TitleDB.");
 

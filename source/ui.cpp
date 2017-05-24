@@ -115,8 +115,6 @@ void drawMain(gfxScreen_t screen){
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 200 - 203/2, (240+30)/2 - 203/2, 0, 430, 203, 203);
 		}
 
-		printf("%i\n", downloading);
-
 		// bar
 		sf2d_draw_rectangle(0, 0, 400, 30, 0xFFBC47AB);
 
