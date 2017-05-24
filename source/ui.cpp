@@ -428,8 +428,14 @@ void UI_update(){
 }
 
 void selectTheme(int id){
-	if(currentSelectedItem == id || id < 0 || id >= themes.size())
+	if(currentSelectedItem == id)
 		return;
+
+	if(id < 0)
+		id = themes.size() - 1;
+
+	if(id >= themes.size())
+		id = 0;
 
 	currentSelectedItem = id;
 	themeListOffset = min((int)themes.size() * 48 + 162, max(0, id * 48 - 81));
