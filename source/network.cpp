@@ -226,7 +226,7 @@ void downloadThemeFromURL(void* url){
 	// move file
 	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str()));
 	if(FSUSER_RenameFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str())))
-		return throwError("Failed to move from temporary path to /Themes -- perhaps file already exists?");
+		return throwError("Failed to move from temporary path to /Themes");
 
 	// scan theme
 	Handle themeDir;
