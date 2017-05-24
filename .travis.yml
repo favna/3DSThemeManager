@@ -21,16 +21,10 @@ install:
 script:
 - cd $TRAVIS_BUILD_DIR
 - sed -i "s/-DVERSION='\".*\"'/-DVERSION='\"$(echo $TRAVIS_COMMIT | cut -c -7)-git\"'/" Makefile
-- make
+- make -j
+after_success:
+- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then npm init -y; npm install github; node ./.travis-upload.js; fi'
 addons:
   apt:
     packages:
     - libstdc++6
-deploy:
-  skip_cleanup: true
-  provider: releases
-  api_key:
-    secure: 0mkx+GiAejHXDq1zf8UMGQjhTEe9f83hxLZV/hLZUgnPzdDUGka2s5BgxV9O99+5nRHcAK/ZrkYVmuDs/G6VgxwUrEijc/K/QXgv+tNPxixY0wC4ZgRWY/vgS5smLgvmUKYJOf+1klA0spx1lUkPTJiBz4/X3EiyDcCPBabFCpqe+zK8CwO9ZeUO/3h8YpzmVk9x0HbEGRRqYd8odlFGg2KVU31tBk6qEQXK9g7cEnyeV1xOaE1FGn9B+K4vqcr4UXAK0q0F8QMqdnqjHGY0VBgAL/J/OeW/lPzPTlH8Mv+UAGrj6BjUFUmVQjEP/FTXW6ZPMYNROBdinbiHSDdnbOgpV2mijE0GCqPiFF2InpROfllkhlx2mO4uEqDp8jZ1m5iYCaSdqeb/HffU7BiqPY8pIYdcj9JMV/kVD2HXG2ATNAMzX6S6GsQuDkB9AcnpizbTM2C1bvsL/JQypZFfUyBm+vQclQvsJ9E01FZyYtEwbHvY3OcDwD8GC5OO4HUisp2rCm5DrljB9SaGBOrefbUf6/JdjREdLFliKhQwlopsS4Lel3/OcPqYIuV7EOHtSlMYcHSKGwwS2fbJvUH8k6PK8IOw+Sqc8F1JKsK0TD6ntrrr8l4SwQft3jz1JacDLKD5afogrpmArxkcVOLL4UMsa0jDmLWftQ0Ekhc7M+k=
-  file:
-    - "output/3ds-arm/Themely.cia"
-    - "output/3ds-arm/3ds/Themely/Themely.3dsx"
