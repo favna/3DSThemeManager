@@ -3,7 +3,7 @@
 
 #include "theme.h"
 
-vector<Theme> themes;
+deque<Theme> themes;
 bool themesScanned = false;
 bool isInstalling = false;
 string installProgress = "";
@@ -13,287 +13,149 @@ bool dumpPrompt = false;
 
 bool shuffleMode = false;
 
-void scanThemes(void*){
-	Result ret;
+void loadTheme(void* entryVP){
+	FS_DirectoryEntry* entry = static_cast<FS_DirectoryEntry*>(entryVP);
 
-	Handle themeDir;
-	ret = FSUSER_OpenDirectory(&themeDir, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes/"));
-	printf("%lX\n", ret);
+	if(entry->attributes & FS_ATTRIBUTE_DIRECTORY){
+		if(fileExists(u"/Themes/" + u16string((char16_t*)entry->name) + u"/body_LZ.bin")){
+			Theme theme = {
+				u16tstr(entry->name, 0x106),
+				u16tstr(entry->name, 0x106),
+				"[description not available]",
+				"Unknown",
+				NULL,
+				NULL,
+				false,
+				true,
+				true,
+				false,
+				fileExists(u"/Themes/" + u16string((char16_t*)entry->name) + u"/bgm.ogg"),
+				fileExists(u"/Themes/" + u16string((char16_t*)entry->name) + u"/Preview.png")
+			};
 
-	while (true){
-		u32 entriesRead;
-		FS_DirectoryEntry entry;
-		FSDIR_Read(themeDir, &entriesRead, 1, &entry);
-		if(entriesRead){
-			if(entry.attributes & FS_ATTRIBUTE_DIRECTORY){
-				if(fileExists(u"/Themes/" + u16string((char16_t*)entry.name) + u"/body_LZ.bin")){
-					Theme theme = {
-						u16tstr(entry.name, 0x106),
-						u16tstr(entry.name, 0x106),
-						"[description not available]",
-						"Unknown",
-						NULL,
-						NULL,
-						false,
-						false,
-						false,
-						false,
-						fileExists(u"/Themes/" + u16string((char16_t*)entry.name) + u"/bgm.ogg"),
-						fileExists(u"/Themes/" + u16string((char16_t*)entry.name) + u"/Preview.png")
-					};
+			LightLock_Init(&theme.lock);
 
-					LightLock_Init(&theme.lock);
+			ifstream smdhFile("/Themes/" + theme.fileName + "/info.smdh", ios::in | ios::binary);
+			if(smdhFile.is_open()){
+				char* buffer = new char[0x520];
+				smdhFile.read(buffer, 0x520);
 
-					themes.push_back(theme);
+				int offset = 0x8;
 
-					if(themes.size() <= 4){
-						themes[themes.size()-1].infoIsloaded = true;
-						themes[themes.size()-1].previewIsLoaded = true;
-						loadThemeInfo((void*)(themes.size()-1));
+				string tmpTitle = "";
+				string tmpDescription = "";
+				string tmpAuthor = "";
+
+				for (size_t i = 0; i < 128; i++){
+					if(buffer[offset + i] == '\00')
+						break;
+
+					tmpTitle += buffer[offset + i];
+					offset++;
+				}
+
+				offset = 0x8 + 128;
+
+				for (size_t i = 0; i < 256; i++){
+					if(buffer[offset + i] == '\00')
+						break;
+
+					tmpDescription += buffer[offset + i];
+					offset++;
+				}
+
+				offset = 0x8 + 128 + 256;
+
+				for (size_t i = 0; i < 128; i++){
+					if(buffer[offset + i] == '\00')
+						break;
+
+					tmpAuthor += buffer[offset + i];
+					offset++;
+				}
+
+				//if(tmpTitle.find_first_not_of('\00') != string::npos)
+				if(tmpTitle.size() != 0)
+					theme.title = tmpTitle;
+
+				if(tmpDescription.size() != 0)
+					theme.description = tmpDescription;
+
+				if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
+					theme.author = tmpAuthor;
+
+				smdhFile.seekg(0x24C0);
+				char* iconBuf = new char[0x1200];
+				smdhFile.read(iconBuf, 0x1200);
+
+				// detects default icons
+				if(iconBuf[0] != '\x9D' && iconBuf[1] != '\x04' && iconBuf[0] != '\xBF' && iconBuf[1] != '\x0D'){
+					theme.icon = sf2d_create_texture(48, 48, TEXFMT_RGB565, SF2D_PLACE_RAM);
+					u16* dst = (u16*)(theme.icon->tex.data + 64 * 8 * 2 * sizeof(u16));
+					u16* src = (u16*)(iconBuf);
+					for (u8 j = 0; j < 48; j += 8){
+						memcpy(dst, src, 48 * 8 * sizeof(u16));
+						src += 48 * 8;
+						dst += 64 * 8;
 					}
 				}
-			} else if(
-				entry.shortExt[0] == 'Z' &&
-				entry.shortExt[1] == 'I' &&
-				entry.shortExt[2] == 'P'){
-				unzFile zipFile = unzOpen((string("/Themes/") + u16tstr(entry.name, 0x106)).c_str());
 
-				if(!zipFile){
-					printf("INVALID ZIP:%s\n", u16tstr(entry.name, 0x106).c_str());
-				 	continue;
-				}
-
-				if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0)){
-					unzClose(zipFile);
-					printf("NO BODY:%s\n", u16tstr(entry.name, 0x106).c_str());
-					continue;
-				}
-
-				Theme theme = {
-					u16tstr(entry.name, 0x106),
-					u16tstr(entry.name, 0x106),
-					"[description not available]",
-					"Unknown",
-					NULL,
-					NULL,
-					true,
-					false,
-					false,
-					false,
-					false,
-					false
-				};
-
-				LightLock_Init(&theme.lock);
-
-				themes.push_back(theme);
-
-				unzClose(zipFile);
-
-				if(themes.size() <= 4){
-					themes[themes.size()-1].infoIsloaded = true;
-					themes[themes.size()-1].previewIsLoaded = true;
-					loadThemeInfo((void*)(themes.size()-1));
-				}
+				delete[] buffer;
+				delete[] iconBuf;
 			}
-		} else
-			break;
-	}
 
-	FSDIR_Close(themeDir);
+			smdhFile.close();
 
-	themesScanned = true;
+			themes.push_back(theme);
 
-	for (size_t i = 0; i < themes.size(); i++){
-		printf("theme:%s by %s\n", themes[i].title.c_str(), themes[i].author.c_str());
-	}
-}
-
-void loadPreview(void* id){
-	if(!themes[(int)id].isZip){
-		while (true){
-			if(!LightLock_TryLock(&themes[(int)id].lock))
-				break;
-
-			svcSleepThread(1);
+			if(themes.size() < 3){
+				themes[themes.size()-1].previewIsLoaded = true;
+				queueTask(loadPreview, (void*)(themes.size()-1), true);
+			}
 		}
-
-		sf2d_texture* tmp;
-		Result res = load_png((string("/Themes/") + themes[(int)id].fileName + "/Preview.png").c_str(), &tmp);
-
-		if(!res){
-			themes[(int)id].preview = tmp;
-			C3D_TexSetFilter(&themes[(int)id].preview->tex, GPU_LINEAR, GPU_LINEAR);
-		} else
-			themes[(int)id].hasPreview = false;
-
-		LightLock_Unlock(&themes[(int)id].lock);
-	} else {
-		// open zip
-		// NOTE: this part is also on the loadThemeInfo function
-		while (true){
-			if(!LightLock_TryLock(&themes[(int)id].lock))
-				break;
-
-			svcSleepThread(1);
-		}
-
-		unzFile zipFile = unzOpen(string("/Themes/" + string(themes[(int)id].fileName)).c_str());
+	} else if(
+		entry->shortExt[0] == 'Z' &&
+		entry->shortExt[1] == 'I' &&
+		entry->shortExt[2] == 'P'){
+		unzFile zipFile = unzOpen((string("/Themes/") + u16tstr(entry->name, 0x106)).c_str());
 
 		if(!zipFile){
-			LightLock_Unlock(&themes[(int)id].lock);
+			printf("INVALID ZIP:%s\n", u16tstr(entry->name, 0x106).c_str());
+			delete entry;
 			return;
 		}
 
-		vector<char> pngData;
-
-		if(unzLocateFile(zipFile, "Preview.png", 0) && unzLocateFile(zipFile, "preview.png", 0)){
+		if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0)){
 			unzClose(zipFile);
-			themes[(int)id].hasPreview = false;
-			LightLock_Unlock(&themes[(int)id].lock);
+			printf("NO BODY:%s\n", u16tstr(entry->name, 0x106).c_str());
+			delete entry;
 			return;
 		}
 
-		if(unzOpenCurrentFile(zipFile)){
-			unzClose(zipFile);
-			themes[(int)id].hasPreview = false;
-			LightLock_Unlock(&themes[(int)id].lock);
-			return;
-		}
+		Theme theme = {
+			u16tstr(entry->name, 0x106),
+			u16tstr(entry->name, 0x106),
+			"[description not available]",
+			"Unknown",
+			NULL,
+			NULL,
+			true,
+			true,
+			true,
+			false,
+			false,
+			false
+		};
 
-		if(zippedFileToVector(zipFile, pngData)){
-			unzCloseCurrentFile(zipFile);
-			unzClose(zipFile);
-			themes[(int)id].hasPreview = false;
-			LightLock_Unlock(&themes[(int)id].lock);
-			return;
-		}
-
-		unzCloseCurrentFile(zipFile);
-		unzClose(zipFile);
-
-		sf2d_texture* tmp;
-		Result res = load_png_mem(pngData, &tmp);
-
-		if(!res){
-			themes[(int)id].preview = tmp;
-			C3D_TexSetFilter(&themes[(int)id].preview->tex, GPU_LINEAR, GPU_LINEAR);
-		} else
-			themes[(int)id].hasPreview = false;
-
-		LightLock_Unlock(&themes[(int)id].lock);
-	}
-}
-
-void loadThemeInfo(void* id){
-	themes[(int)id].infoIsloaded = true;
-
-	if(!themes[(int)id].isZip){
-		while (true){
-			if(!LightLock_TryLock(&themes[(int)id].lock))
-				break;
-
-			svcSleepThread(1);
-		}
-
-		ifstream smdhFile("/Themes/" + themes[(int)id].fileName + "/info.smdh", ios::in | ios::binary);
-		if(smdhFile.is_open()){
-			char* buffer = new char[0x520];
-			smdhFile.read(buffer, 0x520);
-
-			int offset = 0x8;
-
-			string tmpTitle = "";
-			string tmpDescription = "";
-			string tmpAuthor = "";
-
-			for (size_t i = 0; i < 128; i++){
-				if(buffer[offset + i] == '\00')
-					break;
-
-				tmpTitle += buffer[offset + i];
-				offset++;
-			}
-
-			offset = 0x8 + 128;
-
-			for (size_t i = 0; i < 256; i++){
-				if(buffer[offset + i] == '\00')
-					break;
-
-				tmpDescription += buffer[offset + i];
-				offset++;
-			}
-
-			offset = 0x8 + 128 + 256;
-
-			for (size_t i = 0; i < 128; i++){
-				if(buffer[offset + i] == '\00')
-					break;
-
-				tmpAuthor += buffer[offset + i];
-				offset++;
-			}
-
-			//if(tmpTitle.find_first_not_of('\00') != string::npos)
-			if(tmpTitle.size() != 0)
-				themes[(int)id].title = tmpTitle;
-
-			if(tmpDescription.size() != 0)
-				themes[(int)id].description = tmpDescription;
-
-			if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
-				themes[(int)id].author = tmpAuthor;
-
-			smdhFile.seekg(0x24C0);
-			char* iconBuf = new char[0x1200];
-			smdhFile.read(iconBuf, 0x1200);
-
-			// detects default icons
-			if(iconBuf[0] != '\x9D' && iconBuf[1] != '\x04' && iconBuf[0] != '\xBF' && iconBuf[1] != '\x0D'){
-				themes[(int)id].icon = sf2d_create_texture(48, 48, TEXFMT_RGB565, SF2D_PLACE_RAM);
-				u16* dst = (u16*)(themes[(int)id].icon->tex.data + 64 * 8 * 2 * sizeof(u16));
-				u16* src = (u16*)(iconBuf);
-				for (u8 j = 0; j < 48; j += 8){
-					memcpy(dst, src, 48 * 8 * sizeof(u16));
-					src += 48 * 8;
-					dst += 64 * 8;
-				}
-			}
-
-			delete[] buffer;
-			delete[] iconBuf;
-		}
-
-		smdhFile.close();
-
-		LightLock_Unlock(&themes[(int)id].lock);
-
-		loadPreview(id);
-
-		themes[(int)id].infoIsFullyLoaded = true;
-	} else {
-		while (true){
-			if(!LightLock_TryLock(&themes[(int)id].lock))
-				break;
-
-			svcSleepThread(1);
-		}
-
-		unzFile zipFile = unzOpen(string("/Themes/" + string(themes[(int)id].fileName)).c_str());
-
-		if(!zipFile){
-			LightLock_Unlock(&themes[(int)id].lock);
-			return;
-		}
+		LightLock_Init(&theme.lock);
 
 		// check if bgm exists
 		if(!unzLocateFile(zipFile, "bgm.ogg", 0))
-			themes[(int)id].hasBGM = true;
+			theme.hasBGM = true;
 
 		// check if preview exists
 		if(!unzLocateFile(zipFile, "Preview.png", 0) || !unzLocateFile(zipFile, "preview.png", 0))
-			themes[(int)id].hasPreview = true;
+			theme.hasPreview = true;
 
 		if(!unzLocateFile(zipFile, "info.smdh", 0)){
 			if(!unzOpenCurrentFile(zipFile)){
@@ -337,18 +199,18 @@ void loadThemeInfo(void* id){
 						}
 
 						if(tmpTitle.size() != 0)
-							themes[(int)id].title = tmpTitle;
+							theme.title = tmpTitle;
 
 						if(tmpDescription.size() != 0)
-							themes[(int)id].description = tmpDescription;
+							theme.description = tmpDescription;
 
 						if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
-							themes[(int)id].author = tmpAuthor;
+							theme.author = tmpAuthor;
 
 						// detects default icons
 						if(smdhData[0x24C0] != '\x9D' && smdhData[0x24C1] != '\x04' && smdhData[0x24C0] != '\xBF' && smdhData[0x24C1] != '\x0D'){
-							themes[(int)id].icon = sf2d_create_texture(48, 48, TEXFMT_RGB565, SF2D_PLACE_RAM);
-							u16* dst = (u16*)(themes[(int)id].icon->tex.data + 64 * 8 * 2 * sizeof(u16));
+							theme.icon = sf2d_create_texture(48, 48, TEXFMT_RGB565, SF2D_PLACE_RAM);
+							u16* dst = (u16*)(theme.icon->tex.data + 64 * 8 * 2 * sizeof(u16));
 							u16* src = (u16*)(&smdhData[0x24C0]);
 							for (u8 j = 0; j < 48; j += 8){
 								memcpy(dst, src, 48 * 8 * sizeof(u16));
@@ -361,6 +223,94 @@ void loadThemeInfo(void* id){
 					unzCloseCurrentFile(zipFile);
 				}
 			}
+		}
+
+		unzCloseCurrentFile(zipFile);
+		unzClose(zipFile);
+
+		themes.push_back(theme);
+
+		if(themes.size() < 3){
+			themes[themes.size()-1].previewIsLoaded = true;
+			queueTask(loadPreview, (void*)(themes.size()-1), true);
+		}
+	}
+
+	delete entry;
+
+	themesScanned = true;
+}
+
+bool sortDirectoryEntriesByName(FS_DirectoryEntry* a, FS_DirectoryEntry* b){
+	string first = u16tstr(a->name, 0x106);
+	string second = u16tstr(b->name, 0x106);
+
+	transform(first.begin(), first.end(), first.begin(),(int (*)(int))toupper);
+	transform(second.begin(), second.end(), second.begin(),(int (*)(int))toupper);
+
+	return first < second;
+}
+
+void scanThemes(void*){
+	Result ret;
+
+	Handle themeDir;
+	if(FSUSER_OpenDirectory(&themeDir, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes/")))
+		return throwError("Failed to open /Themes/");
+
+	vector<FS_DirectoryEntry*> entries;
+
+	while (true){
+		u32 entriesRead;
+		FS_DirectoryEntry* entry = new FS_DirectoryEntry;
+		FSDIR_Read(themeDir, &entriesRead, 1, entry);
+		if(entriesRead)
+			entries.push_back(entry);
+		else
+			break;
+	}
+
+	FSDIR_Close(themeDir);
+
+	sort(entries.begin(), entries.end(), sortDirectoryEntriesByName);
+
+	for (size_t i = 0; i < entries.size(); i++)
+		queueTask(loadTheme, (void*)entries[i], false);
+}
+
+void loadPreview(void* id){
+	if(!themes[(int)id].isZip){
+		while (true){
+			if(!LightLock_TryLock(&themes[(int)id].lock))
+				break;
+
+			svcSleepThread(0x400000LL);
+		}
+
+		sf2d_texture* tmp;
+		Result res = load_png((string("/Themes/") + themes[(int)id].fileName + "/Preview.png").c_str(), &tmp);
+
+		if(!res){
+			themes[(int)id].preview = tmp;
+			C3D_TexSetFilter(&themes[(int)id].preview->tex, GPU_LINEAR, GPU_LINEAR);
+		} else
+			themes[(int)id].hasPreview = false;
+
+		LightLock_Unlock(&themes[(int)id].lock);
+	} else {
+		// open zip
+		while (true){
+			if(!LightLock_TryLock(&themes[(int)id].lock))
+				break;
+
+			svcSleepThread(0x400000LL);
+		}
+
+		unzFile zipFile = unzOpen(string("/Themes/" + string(themes[(int)id].fileName)).c_str());
+
+		if(!zipFile){
+			LightLock_Unlock(&themes[(int)id].lock);
+			return;
 		}
 
 		vector<char> pngData;
@@ -391,7 +341,6 @@ void loadThemeInfo(void* id){
 		unzClose(zipFile);
 
 		sf2d_texture* tmp;
-		printf("%i,%s\n", (int)id, themes[(int)id].fileName.c_str());
 		Result res = load_png_mem(pngData, &tmp);
 
 		if(!res){
@@ -402,8 +351,6 @@ void loadThemeInfo(void* id){
 
 		LightLock_Unlock(&themes[(int)id].lock);
 	}
-
-	themes[(int)id].infoIsFullyLoaded = true;
 }
 
 void checkInfosToBeLoaded(int id){
@@ -414,18 +361,11 @@ void checkInfosToBeLoaded(int id){
 				if(!LightLock_TryLock(&taskQueueLock))
 					break;
 
-				svcSleepThread(1);
+				svcSleepThread(0x400000LL);
 			}
 
 			for (size_t j = 0; j < taskQueue.size(); j++){
 				if(taskQueue[j].arg == (void*)i){
-					if(taskQueue[j].entrypoint == loadThemeInfo){
-						printf("DELETING TASK FOR THEME %i\n", i);
-						themes[i].infoIsloaded = false;
-						themes[i].previewIsLoaded = false;
-						taskQueue.erase(taskQueue.begin() + j);
-					}
-
 					if(taskQueue[j].entrypoint == loadPreview){
 						printf("DELETING TASK FOR THEME %i\n", i);
 						themes[i].previewIsLoaded = false;
@@ -450,15 +390,9 @@ void checkInfosToBeLoaded(int id){
 			}
 		} else {
 			if(!LightLock_TryLock(&themes[i].lock)){
-				if(!themes[i].infoIsloaded){
-					//printf("loadThemeInfo 4 %i\n", i);
-					themes[i].infoIsloaded = true;
+				if(!themes[i].previewIsLoaded){
 					themes[i].previewIsLoaded = true;
-					queueTask(loadThemeInfo, (void*)i);
-				} else if(!themes[i].previewIsLoaded){
-					//printf("loadPreview   4 %i\n", i);
-					themes[i].previewIsLoaded = true;
-					queueTask(loadPreview, (void*)i);
+					queueTask(loadPreview, (void*)i, true);
 				}
 
 				LightLock_Unlock(&themes[i].lock);

@@ -4,9 +4,13 @@
 #include "network.h"
 
 string update;
+int downloading = -1;
 
-Result HTTPGet(vector<char>& returnedVec, string url){
+Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* progress){
 	printf("URL:%s\n", url.c_str());
+
+	if(progress)
+		*progress = 0;
 
 	// thx https://github.com/devkitPro/3ds-examples/blob/master/network/http/source/main.c
 	Result ret = 0;
@@ -27,8 +31,6 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 
 	ret = httpcBeginRequest(&context);
 	if(ret != 0){
-		/*printf("35-RET:%lX\n", ret);*/
-
 		httpcCloseContext(&context);
 		return ret;
 	}
@@ -37,8 +39,6 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 
 	ret = httpcGetResponseStatusCode(&context, &statuscode);
 	if(ret != 0){
-		/*printf("42-RET:%lX\n", ret);*/
-
 		httpcCloseContext(&context);
 		return ret;
 	}
@@ -46,8 +46,6 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 	if(closing) return -1;
 
 	if(statuscode != 200){
-		/*printf("48-STATUSCODE:%i\n", statuscode);*/
-
 		httpcCloseContext(&context);
 		return -1;
 	}
@@ -55,9 +53,7 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 	if(closing) return -1;
 
 	ret = httpcGetDownloadSizeState(&context, NULL, &contentsize);
-	if(ret != 0){
-		/*printf("55-RET:%lX\n", ret);*/
-
+	if(ret){
 		httpcCloseContext(&context);
 		return ret;
 	}
@@ -66,10 +62,18 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 
 	buf = (u8*)malloc(0x1000);
 	if(buf == NULL){
-		/*printf("62-RET:%lX\n", ret);*/
-
 		httpcCloseContext(&context);
-		return ret;
+		return -1;
+	}
+
+	if(fileName){
+		char* tmpFileName = new char[1024];
+		if(!httpcGetResponseHeader(&context, "Content-Disposition", tmpFileName, 1024)){
+			string tmpFileNameStr = string(tmpFileName);
+			*fileName = tmpFileNameStr.substr(tmpFileNameStr.find("\""), tmpFileNameStr.find_last_of("\"") - tmpFileNameStr.find("\"")).substr(1);
+		}
+
+		delete[] tmpFileName;
 	}
 
 	do {
@@ -77,12 +81,13 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 
 		ret = httpcDownloadData(&context, buf + size, 0x1000, &readsize);
 		size += readsize;
+		if(progress)
+			*progress = min((int)floor((float)size / (float)contentsize * 100.f), 100);
+
 		if (ret == (s32)HTTPC_RESULTCODE_DOWNLOADPENDING){
 				lastbuf = buf;
 				buf = (u8*)realloc(buf, size + 0x1000);
 				if(buf == NULL){
-					/*printf("74-RET:%lX\n", ret);*/
-
 					httpcCloseContext(&context);
 					free(lastbuf);
 					return ret;
@@ -93,8 +98,6 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 	if(closing) return -1;
 
 	if(ret != 0){
-		/*printf("83-RET:%lX\n", ret);*/
-
 		httpcCloseContext(&context);
 		free(buf);
 		return ret;
@@ -105,8 +108,6 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 	lastbuf = buf;
 	buf = (u8*)realloc(buf, size);
 	if(buf == NULL){
-		/*printf("92-RET:%lX\n", ret);*/
-
 		httpcCloseContext(&context);
 		free(lastbuf);
 		return ret;
@@ -115,11 +116,6 @@ Result HTTPGet(vector<char>& returnedVec, string url){
 	if(closing) return -1;
 
 	httpcCloseContext(&context);
-
-	//if(buf[0] == '!'){
-	//	string err = reinterpret_cast<char*>(buf);
-	//	return ret;
-	//}
 
 	for (int i = 0; i < size; i++)
 		returnedVec.push_back(buf[i]);
@@ -178,4 +174,89 @@ void installUpdate(){
 	}
 
 	closing = true;
+}
+
+void downloadThemeFromURL(void* url){
+	vector<char> zipData;
+	string fileName;
+	Result ret = HTTPGet(zipData, string((char*)url), &fileName, &downloading);
+	if(ret){
+		downloading = -1;
+		// TODO: make this non-fatal
+		return throwError("Failed to download ZIP file");
+	}
+
+	if(fileName.size() == 0){
+		downloading = -1;
+		return throwError("Content-Disposition header not in response");
+	}
+
+	if(fileName.size() > 0x106){
+		downloading = -1;
+		return throwError("Filename must not exceed 262 characters");
+	}
+
+	// store it temporarily
+	Handle tmpZip_handle;
+	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"));
+	if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), 0, (u64)zipData.size()))
+		return throwError("Failed to create temporary ZIP file");
+
+	if(FSUSER_OpenFile(&tmpZip_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), FS_OPEN_WRITE, 0))
+		return throwError("Failed to open temporary ZIP file");
+
+	if(FSFILE_Write(tmpZip_handle, nullptr, 0, &zipData[0], (u64)zipData.size(), FS_WRITE_FLUSH))
+		return throwError("Failed to write to the temporary ZIP file");
+
+	FSFILE_Close(tmpZip_handle);
+
+	// verify if the zip is correct
+	unzFile zipFile = unzOpen("/3ds/Themely/tmp.zip");
+	if(!zipFile)
+		return throwError("The ZIP file is invalid");
+
+	if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0)){
+		unzClose(zipFile);
+		return throwError("The ZIP file doesn't contain a body_LZ.bin in the root");
+	}
+
+	unzCloseCurrentFile(zipFile);
+	unzClose(zipFile);
+
+	// move file
+	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str()));
+	if(FSUSER_RenameFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str())))
+		return throwError("Failed to move from temporary path to /Themes -- perhaps file already exists?");
+
+	// scan theme
+	Handle themeDir;
+	if(FSUSER_OpenDirectory(&themeDir, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes/")))
+		return throwError("Failed to open /Themes/");
+
+	FS_DirectoryEntry* foundEntry;
+
+	while (true){
+		u32 entriesRead;
+		FS_DirectoryEntry* entry = new FS_DirectoryEntry;
+		FSDIR_Read(themeDir, &entriesRead, 1, entry);
+		if(entriesRead){
+			if(!u16tstr(entry->name, 0x106).compare(fileName)){
+				foundEntry = entry;
+				break;
+			}
+		} else {
+			throwError("Can't find ZIP in /Themes");
+			break;
+		}
+	}
+
+	FSDIR_Close(themeDir);
+
+	if(foundEntry){
+		loadTheme((void*)foundEntry);
+		loadPreview((void*)themes.size() - 1);
+	}
+
+	downloading = -1;
+	currentSelectedItem = themes.size() - 1;
 }

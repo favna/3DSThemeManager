@@ -10,11 +10,11 @@ struct Task {
 	void* arg;
 };
 
-void queueTask(ThreadFunc, void*);
+void queueTask(ThreadFunc, void*, bool putInFront = false);
 void startWorkers();
 void cleanTaskQueue();
 
 extern Thread THREADS[2];
-extern vector<Task> taskQueue;
+extern deque<Task> taskQueue;
 extern LightLock taskQueueLock;
 extern volatile uint threadsRunning;

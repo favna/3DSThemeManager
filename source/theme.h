@@ -29,7 +29,7 @@ struct Theme {
 	LightLock lock;
 };
 
-extern vector<Theme> themes;
+extern deque<Theme> themes;
 extern bool themesScanned;
 extern bool isInstalling;
 extern string installProgress;
@@ -39,6 +39,7 @@ extern bool dumpPrompt;
 
 extern bool shuffleMode;
 
+void loadTheme(void*);
 void scanThemes(void*);
 void loadThemeInfo(void*);
 void checkInfosToBeLoaded(int);

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iterator>
+#include <deque>
 
 #include <3ds.h>
 #include <sf2d.h>

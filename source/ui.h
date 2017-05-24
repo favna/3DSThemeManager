@@ -8,6 +8,7 @@
 #include "thread.h"
 #include "audio.h"
 #include "network.h"
+#include "camera.h"
 
 struct texture {
 	sf2d_texture* tx;
@@ -23,6 +24,7 @@ struct fontList {
 	sftd_font* normal;
 	sftd_font* small;
 	sftd_font* light;
+	sftd_font* huge;
 };
 
 extern textureList TEXTURE;

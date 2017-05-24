@@ -91,7 +91,7 @@ bool fileExists(u16string name){
 		&tempFileHandle,
 		ARCHIVE_SDMC,
 		fsMakePath(PATH_EMPTY, ""),
-		fsMakePath(PATH_UTF16, name.data()),
+		fsMakePath(PATH_UTF16, name.c_str()),
 		FS_OPEN_READ,
 		0x00000000
 	) == 0;
@@ -105,61 +105,21 @@ string u16tstr(u16* str, size_t size){
 	if(size == 0)
 		return string("");
 
-	char* out = new char[size];
+	char* out = new char[size + 1];
 	size_t len = utf16_to_utf8((uint8_t*)out, str, size);
-	out[min(len, size)] = '\0';
 
-	return string(out);
+	return string(out, min(len, size));
 }
 
 u16string strtu16str(string& str){
 	if(str.size() == 0)
 		return u16string(u"");
 
-	char16_t* out = new char16_t[str.size()];
+	char16_t* out = new char16_t[str.size() + 1];
 	size_t len = utf8_to_utf16((uint16_t*)out, (uint8_t*)&str[0], str.size());
-	out[min(len, str.size())] = '\0';
 
-	return u16string(out);
+	return u16string(out, min(len, str.size()));
 }
-
-/*
-size_t read_file_to_mem(char** data, const char* path, u32 offset){
-	FILE* fp;
-	u32 file_size;
-
-	fp = fopen(path, "rb");
-	if(!fp)
-		return 0;
-
-	fseek(fp, 0, SEEK_END);
-	file_size = ftell(fp);
-
-	if(file_size <= offset){
-		fclose(fp);
-		return 0;
-	}
-
-	fseek(fp, offset, SEEK_SET);
-	file_size -= offset;
-
-	*data = (char*)malloc(file_size);
-	if(!*data){
-		fclose(fp);
-		return 0;
-	}
-
-	if(fread(*data, 1, file_size, fp) != file_size){
-		free(*data);
-		fclose(fp);
-		return 0;
-	}
-
-	fclose(fp);
-
-	return file_size;
-}
-*/
 
 int fileToVector(string path, vector<char>& vector){
 	ifstream file(path, ios::in | ios::binary);

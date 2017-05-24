@@ -18,6 +18,8 @@ void start(){
 
 	Result ret;
 
+	APT_SetAppCpuTimeLimit(80);
+
 	// Initiate services
 	romfsInit();
 	httpcInit(0);
@@ -90,6 +92,9 @@ void cleanup(){
 	}
 
 	httpcExit();
+
+	if(QRMode)
+		stopQRMode();
 
 	if(STATE.shouldSaveConfig)
 		CONFIG_save();
