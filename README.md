@@ -14,7 +14,7 @@
 - ctrulib 1.2.1
 - Latest version of sf2dlib
 - Latest version of sftdlib
-- zlib, libpng, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/devkitPro/3ds_portlibs/ recommended)
+- zlib, libpng, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/ErmanSayin/3ds_portlibs/ recommended)
 
 You can run the `deps.sh` script to install sf2dlib, sftdlib, and 3ds-portlibs automatically (`git` and DevkitARM required).
 
