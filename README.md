@@ -1,5 +1,9 @@
 <p align="center"><img src="https://github.com/ErmanSayin/Themely/raw/master/meta/banner_3ds.png"/></p>
 
+[![Build Status](https://travis-ci.org/ErmanSayin/Themely.svg?branch=master)](https://travis-ci.org/ErmanSayin/Themely)
+
+**[Bleeding edge builds](https://3dsthem.es/app/)**
+
 # Description
 
 **Themely** is a custom home menu manager for the Nintendo 3DS.
