@@ -176,7 +176,7 @@ void installUpdate(){
 		vector<char> threedsxData;
 		Result ret = HTTPGet(threedsxData, updateDownloadURL);
 		if(ret)
-			return throwError("Failed to download update 3DSX. If you're still having problems,\nupdate manually.");
+			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_manual"));
 
 		Handle threedsxHandle;
 		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely.3dsx"));
@@ -195,7 +195,7 @@ void installUpdate(){
 		vector<char> ciaData;
 		Result ret = HTTPGet(ciaData, updateDownloadURL);
 		if(ret)
-			return throwError("Failed to download update CIA. If you're still having problems, update through FBI -> TitleDB.");
+			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_titledb"));
 
 		amInit();
 		Handle handle;
@@ -216,7 +216,7 @@ void downloadThemeFromURL(void* url){
 	if(ret){
 		downloading = -1;
 		// TODO: make this non-fatal
-		return throwError("Failed to download ZIP file");
+		return throwError(i18n("err_zip_dl_fail"));
 	}
 
 	if(fileName.size() == 0){
@@ -246,11 +246,11 @@ void downloadThemeFromURL(void* url){
 	// verify if the zip is correct
 	unzFile zipFile = unzOpen("/3ds/Themely/tmp.zip");
 	if(!zipFile)
-		return throwError("The ZIP file is invalid");
+		return throwError(i18n("err_zip_invalid"));
 
 	if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0)){
 		unzClose(zipFile);
-		return throwError("The ZIP file doesn't contain a body_LZ.bin in the root");
+		return throwError(i18n("err_zip_no_body"));
 	}
 
 	unzCloseCurrentFile(zipFile);

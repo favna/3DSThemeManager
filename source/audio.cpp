@@ -82,7 +82,7 @@ void AUDIO_load(string path){
 	currentPlayingAudio->status = ov_open(mus, &currentPlayingAudio->vf, NULL, 0);
 	// TODO: make this non fatal
 	if(currentPlayingAudio->status)
-		return throwError(string("Failed to play BGM -- ") + ov_error_to_string(currentPlayingAudio->status));
+		return throwError(i18n("err_bgm_fail") + L" -- " + s2ws(ov_error_to_string(currentPlayingAudio->status)));
 
 	vorbis_info *vi = ov_info(&currentPlayingAudio->vf, -1);
 

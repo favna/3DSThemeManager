@@ -32,7 +32,7 @@ struct Theme {
 extern deque<Theme> themes;
 extern bool themesScanned;
 extern bool isInstalling;
-extern string installProgress;
+extern wstring installProgress;
 
 extern bool deletePrompt;
 extern bool dumpPrompt;

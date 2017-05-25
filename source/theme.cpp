@@ -6,7 +6,7 @@
 deque<Theme> themes;
 bool themesScanned = false;
 bool isInstalling = false;
-string installProgress = "";
+wstring installProgress = L"";
 
 bool deletePrompt = false;
 bool dumpPrompt = false;
@@ -21,8 +21,8 @@ void loadTheme(void* entryVP){
 			Theme theme = {
 				u16tstr(entry->name, 0x106),
 				u16tstr(entry->name, 0x106),
-				"[description not available]",
-				"Unknown",
+				ws2s(i18n("no_desc")),
+				ws2s(i18n("unknown")),
 				NULL,
 				NULL,
 				false,
@@ -135,8 +135,8 @@ void loadTheme(void* entryVP){
 		Theme theme = {
 			u16tstr(entry->name, 0x106),
 			u16tstr(entry->name, 0x106),
-			"[description not available]",
-			"Unknown",
+			ws2s(i18n("no_desc")),
+			ws2s(i18n("unknown")),
 			NULL,
 			NULL,
 			true,
@@ -256,7 +256,7 @@ void scanThemes(void*){
 
 	Handle themeDir;
 	if(FSUSER_OpenDirectory(&themeDir, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes/")))
-		return throwError("Failed to open /Themes/");
+		return throwError(i18n("err_fail_open", "/Themes/"));
 
 	vector<FS_DirectoryEntry*> entries;
 
@@ -402,7 +402,7 @@ void checkInfosToBeLoaded(int id){
 }
 
 void installTheme(void* noBGM){
-	installProgress = "Reading body_LZ.bin...";
+	installProgress = i18n("install_reading", "body_LZ.bin");
 
 	Result ret = 0;
 	vector<char> bodyData;
@@ -411,9 +411,9 @@ void installTheme(void* noBGM){
 	// Load data
 	if(!themes[currentSelectedItem].isZip){
 		if(fileToVector(string("/Themes/") + themes[currentSelectedItem].fileName + "/body_LZ.bin", bodyData))
-			return throwError("Failed to open body_LZ.bin file");
+			return throwError(i18n("err_fail_open", "body_LZ.bin"));
 
-		installProgress += "\nReading BGM.bcstm...";
+		installProgress += wstring(L"\n") + i18n("install_reading", "BGM.bcstm");
 
 		if(!(bool)noBGM)
 			fileToVector(string("/Themes/") + themes[currentSelectedItem].fileName + "/bgm.bcstm", BGMData);
@@ -421,13 +421,13 @@ void installTheme(void* noBGM){
 		unzFile zipFile = unzOpen(string("/Themes/" + string(themes[currentSelectedItem].fileName)).c_str());
 
 		if(!zipFile)
-			return throwError("Failed to open ZIP file");
+			return throwError(i18n("err_fail_open", "ZIP"));
 
 		if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0))
-			return throwError("Can't find body_LZ.bin file in ZIP");
+			return throwError(L"Can't find body_LZ.bin file in ZIP");
 
 		if(unzOpenCurrentFile(zipFile))
-			return throwError("Can't open body_LZ.bin file in ZIP");
+			return throwError(L"Can't open body_LZ.bin file in ZIP");
 
 		ret = zippedFileToVector(zipFile, bodyData);
 		if(ret)
@@ -435,11 +435,11 @@ void installTheme(void* noBGM){
 
 		unzCloseCurrentFile(zipFile);
 
-		installProgress += "\nReading BGM.bcstm...";
+		installProgress += wstring(L"\n") + i18n("install_reading", "BGM.bcstm");
 
 		if(!(bool)noBGM && !unzLocateFile(zipFile, "bgm.bcstm", 0)){
 			if(unzOpenCurrentFile(zipFile))
-				return throwError("Can't open bgm.bcstm file in ZIP");
+				return throwError(L"Can't open bgm.bcstm file in ZIP");
 
 			ret = zippedFileToVector(zipFile, BGMData);
 			if(ret)
@@ -448,7 +448,7 @@ void installTheme(void* noBGM){
 			unzCloseCurrentFile(zipFile);
 		}
 
-		installProgress += "\nReading SaveData.dat...";
+		installProgress += wstring(L"\n") + i18n("install_reading", "SaveData.dat");
 
 		unzClose(zipFile);
 	}
@@ -459,15 +459,15 @@ void installTheme(void* noBGM){
 	Handle saveDataDat_handle;
 
 	if(FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0))
-		return throwError("Failed to open SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_open", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
 
 	FSFILE_GetSize(saveDataDat_handle, &saveDataDat_size);
 
 	saveDataDat_buf = new u8[saveDataDat_size];
 	if(FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size))
-		return throwError("Failed to read SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_read", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
 
-	installProgress += "\nWriting to SaveData.dat...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "SaveData.dat");
 
 	if(
 		!(
@@ -483,7 +483,7 @@ void installTheme(void* noBGM){
 		saveDataDat_buf[0x13b8] = 0xff; // theme index
 
 		if(FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH))
-			return throwError("Failed to write to SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
 	}
 
 	free(saveDataDat_buf);
@@ -495,16 +495,16 @@ void installTheme(void* noBGM){
 	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0)){
 		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"));
 		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)0x150000))
-			return throwError("Failed to create BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(L"Failed to create BodyCache.bin." + wstring(L" ") + i18n("err_try_default"));
 
 		if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0))
-			return throwError("Failed to open BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(i18n("err_fail_open", "BodyCache.bin") + wstring(L" ") + i18n("err_try_default"));
 	}
 
-	installProgress += "\nWriting to BodyCache.bin...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "BodyCache.bin");
 
 	if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0, &bodyData[0], (u64)bodyData.size(), FS_WRITE_FLUSH))
-		return throwError("Failed to write to BodyCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_write", "BodyCache.bin") + wstring(L" ") + i18n("err_try_default"));
 
 	FSFILE_Close(bodyCacheBin_handle);
 
@@ -514,13 +514,13 @@ void installTheme(void* noBGM){
 	if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0)){
 		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"));
 		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008))
-			return throwError("Failed to create BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(L"Failed to create BgmCache.bin." + wstring(L" ") + i18n("err_try_default"));
 
 		if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0))
-			return throwError("Failed to open BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(i18n("err_fail_open", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"));
 	}
 
-	installProgress += "\nWriting to BgmCache.bin...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "BgmCache.bin");
 
 	if(BGMData.size() != 0)
 		ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, &BGMData[0], BGMData.size(), FS_WRITE_FLUSH);
@@ -530,7 +530,7 @@ void installTheme(void* noBGM){
 		delete[] empty;
 	}
 	if(ret)
-		return throwError("Failed to write to BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_write", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"));
 
 	FSFILE_Close(bgmCacheBin_handle);
 
@@ -540,15 +540,15 @@ void installTheme(void* noBGM){
 
 	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"));
 	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
-	//	return throwError("Failed to create ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	//	return throwError(L"Failed to create ThemeManage.bin." + wstring(L" ") + i18n("err_try_default"));
 
 	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_open", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
 
 	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
-		return throwError("Failed to read ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_read", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
 
-	installProgress += "\nWriting to ThemeManage.bin...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "ThemeManage.bin");
 
 	themeManageBin_buf[0x00] = 1;
 	themeManageBin_buf[0x01] = 0;
@@ -591,16 +591,16 @@ void installTheme(void* noBGM){
 	//memcpy(themeManageBin_buf, thememanage, 0x20);
 
 	if(FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH))
-		return throwError("Failed to write to ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_write", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
 
 	FSFILE_Close(themeManageBin_handle);
 
 	isInstalling = false;
-	installProgress = "";
+	installProgress = L"";
 }
 
 void installShuffle(void*){
-	installProgress = "Reading body_LZ.bin\n& BGM.bcstm...";
+	installProgress = i18n("install_reading", "body_LZ.bin\n& BGM.bcstm");
 
 	Result ret = 0;
 	vector<vector<char>> bodyData;
@@ -615,7 +615,7 @@ void installShuffle(void*){
 			if(!themes[i].isZip){
 				vector<char> tmpBodyData;
 				if(fileToVector(string("/Themes/") + themes[i].fileName + "/body_LZ.bin", tmpBodyData))
-					return throwError("Failed to open body_LZ.bin file");
+					return throwError(L"Failed to open body_LZ.bin file");
 
 				bodyData.push_back(tmpBodyData);
 				vector<char> tmpBGMData;
@@ -628,13 +628,13 @@ void installShuffle(void*){
 				unzFile zipFile = unzOpen(string("/Themes/" + string(themes[i].fileName)).c_str());
 
 				if(!zipFile)
-					return throwError("Failed to open ZIP file");
+					return throwError(L"Failed to open ZIP file");
 
 				if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0))
-					return throwError("Can't find body_LZ.bin file in ZIP");
+					return throwError(L"Can't find body_LZ.bin file in ZIP");
 
 				if(unzOpenCurrentFile(zipFile))
-					return throwError("Can't open body_LZ.bin file in ZIP");
+					return throwError(L"Can't open body_LZ.bin file in ZIP");
 
 				vector<char> tmpBodyData;
 				ret = zippedFileToVector(zipFile, tmpBodyData);
@@ -648,7 +648,7 @@ void installShuffle(void*){
 
 				if(!themes[i].shuffleNoBGM && !unzLocateFile(zipFile, "bgm.bcstm", 0)){
 					if(unzOpenCurrentFile(zipFile))
-						return throwError("Can't open bgm.bcstm file in ZIP");
+						return throwError(L"Can't open bgm.bcstm file in ZIP");
 
 					ret = zippedFileToVector(zipFile, tmpBGMData);
 					if(ret)
@@ -674,15 +674,15 @@ void installShuffle(void*){
 	Handle saveDataDat_handle;
 
 	if(FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0))
-		return throwError("Failed to open SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_open", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
 
 	FSFILE_GetSize(saveDataDat_handle, &saveDataDat_size);
 
 	saveDataDat_buf = new u8[saveDataDat_size];
 	if(FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size))
-		return throwError("Failed to read SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_read", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
 
-	installProgress += "\nWriting to SaveData.dat...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "SaveData.dat");
 
 	if(
 		!(
@@ -706,7 +706,7 @@ void installShuffle(void*){
 		}
 
 		if(FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH))
-			return throwError("Failed to write to SaveData.dat. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
 	}
 
 	delete[] saveDataDat_buf;
@@ -717,18 +717,18 @@ void installShuffle(void*){
 	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), FS_OPEN_WRITE, 0)){
 		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"));
 		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), 0, 0x150000*10))
-			return throwError("Failed to create BodyCache_rd.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(L"Failed to create BodyCache_rd.bin." + wstring(L" ") + i18n("err_try_default"));
 
 		if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), FS_OPEN_WRITE, 0))
-			return throwError("Failed to open BodyCache_rd.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(i18n("err_fail_open", "BodyCache_rd.bin") + wstring(L" ") + i18n("err_try_default"));
 	}
 
-	installProgress += "\nWriting to BodyCache_rd.bin...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "BodyCache_rd.bin");
 
 	for (size_t i = 0; i < 10; i++) {
 		if(themeCount > i){
 			if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, &bodyData[i][0], bodyData[i].size(), FS_WRITE_FLUSH))
-				return throwError("Failed to write to BodyCache_rd.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+				return throwError(i18n("err_fail_write", "BodyCache_rd.bin") + wstring(L" ") + i18n("err_try_default"));
 		} else {
 			char* empty = new char[0x150000]();
 			FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, empty, 0x150000, FS_WRITE_FLUSH);
@@ -738,7 +738,7 @@ void installShuffle(void*){
 
 	FSFILE_Close(bodyCacheBin_handle);
 
-	installProgress += "\nWriting to BgmCache_**.bin...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "BgmCache_**.bin");
 
 	// Inject bgm.bcstm into BgmCache.bin
 	for (size_t i = 0; i < 10; i++){
@@ -746,10 +746,10 @@ void installShuffle(void*){
 		if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), FS_OPEN_WRITE, 0)){
 			FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()));
 			if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), 0, (u64)3371008))
-				return throwError("Failed to create BgmCache_0" + to_string(i) + ".bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+				return throwError(L"Failed to create BgmCache_0" + to_wstring(i) + L".bin." + wstring(L" ") + i18n("err_try_default"));
 
 			if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), FS_OPEN_WRITE, 0))
-				return throwError("Failed to open BgmCache_0" + to_string(i) + ".bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+				return throwError(i18n("err_fail_open", "BgmCache_0" + to_string(i) + ".bin") + wstring(L" ") + i18n("err_try_default"));
 		}
 
 		if(themeCount > i && BGMData[i].size() != 0)
@@ -761,7 +761,7 @@ void installShuffle(void*){
 		}
 
 		if(ret)
-			return throwError("Failed to write to BgmCache.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+			return throwError(i18n("err_fail_write", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"));
 
 		FSFILE_Close(bgmCacheBin_handle);
 	}
@@ -772,15 +772,15 @@ void installShuffle(void*){
 
 	//FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"));
 	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
-	//	return throwError("Failed to create ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+	//	return throwError(L"Failed to create ThemeManage.bin." + wstring(L" ") + i18n("err_try_default"));
 
 	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_open", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
 
 	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
-		return throwError("Failed to read ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_read", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
 
-	installProgress += "\nWriting to ThemeManage.bin...";
+	installProgress += wstring(L"\n") + i18n("install_writing", "ThemeManage.bin");
 
 	themeManageBin_buf[0x00] = 1;
 	themeManageBin_buf[0x01] = 0;
@@ -811,14 +811,14 @@ void installShuffle(void*){
 	}
 
 	if(FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH))
-		return throwError("Failed to write to ThemeManage.bin. Try selecting one of the default COLOR themes on the home menu settings before trying again");
+		return throwError(i18n("err_fail_write", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
 
 	FSFILE_Close(themeManageBin_handle);
 
 	exitShuffleMode();
 
 	isInstalling = false;
-	installProgress = "";
+	installProgress = L"";
 }
 
 void exitShuffleMode(){
@@ -853,7 +853,7 @@ void dumpTheme(){
 	}
 
 	if(num.size() == 0)
-		return throwError("Ran out of numbers for the dump name. Clean that shit");
+		return throwError(L"Ran out of numbers for the dump name. Clean that shit");
 
 	u8* themeManageBin_buf = new u8[0x800];
 	Handle themeManageBin_handle;
@@ -871,10 +871,10 @@ void dumpTheme(){
 
 	// get size of body and bgm
 	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open ThemeManage.bin");
+		return throwError(L"Failed to open ThemeManage.bin");
 
 	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
-		return throwError("Failed to read ThemeManage.bin");
+		return throwError(L"Failed to read ThemeManage.bin");
 
 	bodyCacheBin_size = (u64)(*((u32*)&themeManageBin_buf[0x08]));
 	bgmCacheBin_size = (u64)(*((u32*)&themeManageBin_buf[0x0C]));
@@ -884,20 +884,20 @@ void dumpTheme(){
 
 	// get body
 	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_READ, 0))
-		return throwError("Failed to open BodyCache.bin. Perhaps you don't have a theme set?");
+		return throwError(L"Failed to open BodyCache.bin. Perhaps you don't have a theme set?");
 
 	bodyCacheBin_buf = new u8[bodyCacheBin_size];
 	if(FSFILE_Read(bodyCacheBin_handle, nullptr, 0, bodyCacheBin_buf, (u32)bodyCacheBin_size))
-		return throwError("Failed to read BodyCache.bin. Perhaps you don't have a theme set?");
+		return throwError(L"Failed to read BodyCache.bin. Perhaps you don't have a theme set?");
 
 	if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), 0, (u64)bodyCacheBin_size))
-		return throwError("Failed to create body_LZ.bin");
+		return throwError(L"Failed to create body_LZ.bin");
 
 	if(FSUSER_OpenFile(&bodyOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open body_LZ.bin");
+		return throwError(L"Failed to open body_LZ.bin");
 
 	if(FSFILE_Write(bodyOutput_handle, nullptr, 0, bodyCacheBin_buf, bodyCacheBin_size, FS_WRITE_FLUSH))
-		return throwError("Failed to write to body_LZ.bin");
+		return throwError(L"Failed to write to body_LZ.bin");
 
 	delete[] bodyCacheBin_buf;
 
@@ -929,7 +929,7 @@ void toggleBGM(){
 		return;
 
 	if(!fileExists(u"/3ds/dspfirm.cdc"))
-		return throwError("DSP dump not found! Use DspDump to dump the DSP firmware required to playback audio.");
+		return throwError(i18n("err_no_dsp"));
 
 	string path;
 
@@ -937,13 +937,13 @@ void toggleBGM(){
 		unzFile zipFile = unzOpen(string("/Themes/" + string(themes[currentSelectedItem].fileName)).c_str());
 
 		if(!zipFile)
-			return throwError("Failed to open ZIP file");
+			return throwError(L"Failed to open ZIP file");
 
 		if(unzLocateFile(zipFile, "bgm.ogg", 0))
-			return throwError("Can't find bgm.ogg file in ZIP");
+			return throwError(L"Can't find bgm.ogg file in ZIP");
 
 		if(unzOpenCurrentFile(zipFile))
-			return throwError("Can't open bgm.ogg file in ZIP");
+			return throwError(L"Can't open bgm.ogg file in ZIP");
 
 		std::vector<char> oggData;
 		int ret = zippedFileToVector(zipFile, oggData);

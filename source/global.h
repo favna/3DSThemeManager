@@ -13,6 +13,8 @@
 #include <cmath>
 #include <iterator>
 #include <deque>
+#include <locale>
+#include <codecvt>
 
 #include <3ds.h>
 #include <sf2d.h>
@@ -38,16 +40,15 @@ extern u64 ARCHIVE_HomeExt;
 extern u64 ARCHIVE_ThemeExt;
 
 extern bool isError;
-extern string error;
+extern wstring error;
 
 void throwError(string);
+void throwError(wstring);
 
-void utf2ascii(char*, u16*);
-void ascii2utf(u16*, char*);
-
-bool invalidChar(char);
-void stripUnicode(string&);
+wstring s2ws(const string&);
+string ws2s(const wstring&);
 string wrap(const string, size_t);
+wstring wrap(const wstring, size_t);
 int numOfDigits(const string);
 
 bool fileExists(u16string);

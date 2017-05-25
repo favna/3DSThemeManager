@@ -17,46 +17,58 @@ u64 ARCHIVE_HomeExt;
 u64 ARCHIVE_ThemeExt;
 
 bool isError = false;
-string error = "";
+wstring error = L"";
 
 void throwError(string err){
-	printf("%s:%d:%s\n", __FILE__, __LINE__, err.c_str());
+	throwError(wstring(err.begin(), err.end()));
+}
+
+void throwError(wstring err){
+	printf("%s:%d:%ls\n", __FILE__, __LINE__, err.c_str());
 	error = err;
 	isError = true;
 }
 
-void utf2ascii(char* dst, u16* src){
-	if(!src || !dst)
-		return;
+wstring s2ws(const string& str){
+	using convert_typeX = codecvt_utf8<wchar_t>;
+	wstring_convert<convert_typeX, wchar_t> converterX;
 
-	while (*src)
-		*(dst++) = (*(src++)) & 0xFF;
-
-	*dst = 0x00;
+	return converterX.from_bytes(str);
 }
 
-void ascii2utf(u16* dst, char* src){
-	if(!src || !dst)
-		return;
+string ws2s(const wstring& wstr){
+	using convert_typeX = codecvt_utf8<wchar_t>;
+	wstring_convert<convert_typeX, wchar_t> converterX;
 
-	while (*src)
-		*(dst++) = (*src++);
-
-	*dst = 0x00;
+	return converterX.to_bytes(wstr);
 }
 
-bool invalidChar(char c){
-	return !(c>=0 && c <128);
-}
-
-void stripUnicode(string &str){
-	str.erase(remove_if(str.begin(),str.end(), invalidChar), str.end());
-}
-
-string wrap(const string text, size_t line_length){
+string wrap(const string text, size_t line_length) {
 	istringstream words(text);
 	ostringstream wrapped;
 	string word;
+
+	if(words >> word){
+		wrapped << word;
+		size_t space_left = line_length - word.length();
+		while (words >> word){
+			if(space_left < word.length() + 1){
+				wrapped << '\n' << word;
+				space_left = line_length - word.length();
+			} else {
+				wrapped << ' ' << word;
+				space_left -= word.length() + 1;
+			}
+		}
+	}
+
+	return wrapped.str();
+}
+
+wstring wrap(const wstring text, size_t line_length){
+	basic_istringstream<wchar_t> words(text);
+	basic_ostringstream<wchar_t> wrapped;
+	wstring word;
 
 	if(words >> word){
 		wrapped << word;

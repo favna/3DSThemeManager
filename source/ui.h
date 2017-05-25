@@ -9,6 +9,7 @@
 #include "audio.h"
 #include "network.h"
 #include "camera.h"
+#include "i18n.h"
 
 struct texture {
 	sf2d_texture* tx;

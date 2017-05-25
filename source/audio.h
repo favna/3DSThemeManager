@@ -5,6 +5,7 @@
 
 #include "global.h"
 #include "thread.h"
+#include "i18n.h"
 
 #include <tremor/ivorbisfile.h>
 

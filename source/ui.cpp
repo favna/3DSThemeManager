@@ -29,6 +29,10 @@ void sftd_draw_text_center(sftd_font* font, int x, int y, unsigned int color, un
 	sftd_draw_text(font, (sf2d_get_current_screen() == GFX_TOP ? 400 : 320) / 2 - sftd_get_text_width(font, size, text) / 2 + x, y, color, size, text);
 }
 
+void sftd_draw_wtext_center(sftd_font* font, int x, int y, unsigned int color, unsigned int size, const wchar_t* text){
+	sftd_draw_wtext(font, (sf2d_get_current_screen() == GFX_TOP ? 400 : 320) / 2 - sftd_get_wtext_width(font, size, text) / 2 + x, y, color, size, text);
+}
+
 u32 getLoadingAnim(){
 	loadingAnimTimer += 2;
 
@@ -125,12 +129,12 @@ void drawMain(gfxScreen_t screen){
 		sftd_draw_text(FONT.normal, 85, 8, 0xFFFFFFFF, 13, (string("v") + VERSION).c_str());
 
 		// theme count
-		string s;
+		wstring s;
 		if(QRMode)
-			s = "QR Code scanner";
+			s = i18n("qr_scanner");
 		else
-			s = to_string(themes.size()) + " theme" + (themes.size() != 1 ? "s" : "");
-		sftd_draw_text(FONT.normal, 400 - sftd_get_text_width(FONT.normal, 13, s.c_str()) - 8, 5, 0xFFFFFFFF, 13, s.c_str());
+			s = i18n("themes", themes.size(), (themes.size() != 1 ? i18n("plural_suffix") : L"").c_str());
+		sftd_draw_wtext(FONT.normal, 400 - sftd_get_wtext_width(FONT.normal, 13, s.c_str()) - 8, 5, 0xFFFFFFFF, 13, s.c_str());
 
 		if(!QRMode){
 			if(themes.size() != 0){
@@ -139,21 +143,21 @@ void drawMain(gfxScreen_t screen){
 
 				// description
 				istringstream iss(wrap(themes[currentSelectedItem].description, 30));
-				s = "";
+				string desc = "";
 				for (size_t i = 0; i < 6; i++){
 					string line;
 
 					if(!getline(iss, line))
 						break;
 
-					s += (i ? "\n" : "") + line;
+					desc += (i ? "\n" : "") + line;
 				}
-				sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, s.c_str());
+				sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, desc.c_str());
 
 				// author
-				int authorY = (count(s.begin(), s.end(), '\n') + 1) * 14;
-				s = string("by ") + themes[currentSelectedItem].author;
-				sftd_draw_text(FONT.normal, 400 - sftd_get_text_width(FONT.normal, 13, s.c_str()) - 8, 70 + authorY, 0xFFFFFFFF, 13, s.c_str());
+				int authorY = (count(desc.begin(), desc.end(), L'\n') + 1) * 14;
+				s = i18n("by", themes[currentSelectedItem].author.c_str());
+				sftd_draw_wtext(FONT.normal, 400 - sftd_get_wtext_width(FONT.normal, 13, s.c_str()) - 8, 70 + authorY, 0xFFFFFFFF, 13, s.c_str());
 
 				bool fullscreenBtn = true;
 				bool BGMBtn = themes[currentSelectedItem].hasBGM;
@@ -162,29 +166,29 @@ void drawMain(gfxScreen_t screen){
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219 - BGMBtn*17 - fullscreenBtn*17, 400, 0, 15, 15);
 				if(shuffleMode)
 					if(themes[currentSelectedItem].toShuffle)
-						s = "Remove from shuffle";
+						s = i18n("remove_from_shuffle");
 					else
-						s = "Add to shuffle";
+						s = i18n("add_to_shuffle");
 				else
-					s = "Install";
-				sftd_draw_text(FONT.small, 196, 220 - BGMBtn*17 - fullscreenBtn*17, 0xFFFFFFFF, 11, s.c_str());
+					s = i18n("install");
+				sftd_draw_wtext(FONT.small, 196, 220 - BGMBtn*17 - fullscreenBtn*17, 0xFFFFFFFF, 11, s.c_str());
 
 				// without bgm
-				int w = sftd_get_text_width(FONT.small, 11, "w/o BGM");
+				int w = sftd_get_wtext_width(FONT.small, 11, i18n("w_o_bgm").c_str());
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 30 - 3, 219 - BGMBtn*17 - fullscreenBtn*17, 490, 0, 30, 15);
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 400 - w - 8 - 30 - 3 - 10, 219 - BGMBtn*17 - fullscreenBtn*17, 520, 0, 15, 15);
-				sftd_draw_text(FONT.small, 400 - w - 8, 220 - BGMBtn*17 - fullscreenBtn*17, 0xFFFFFFFF, 11, "w/o BGM");
+				sftd_draw_wtext(FONT.small, 400 - w - 8, 220 - BGMBtn*17 - fullscreenBtn*17, 0xFFFFFFFF, 11, i18n("w_o_bgm").c_str());
 
 				// fullscreen preview button & delete
 				sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219 - BGMBtn*17, 430, 0, 15, 15);
-				sftd_draw_text(FONT.small, 400 - sftd_get_text_width(FONT.small, 11, "[hold] delete") - 8, 220 - BGMBtn*17, 0xFFFFFFFF, 11, "[hold] delete");
+				sftd_draw_wtext(FONT.small, 400 - sftd_get_wtext_width(FONT.small, 11, i18n("hold_delete").c_str()) - 8, 220 - BGMBtn*17, 0xFFFFFFFF, 11, i18n("hold_delete").c_str());
 				if(themes[currentSelectedItem].preview)
-					sftd_draw_text(FONT.small, 196, 220 - BGMBtn*17, 0xFFFFFFFF, 11, "Fullscreen preview");
+					sftd_draw_wtext(FONT.small, 196, 220 - BGMBtn*17, 0xFFFFFFFF, 11, i18n("fullscreen_prev").c_str());
 
 				// bgm preview button
 				if(BGMBtn){
 					sf2d_draw_texture_part(TEXTURE.ui.tx, 178, 219, 445, 0, 15, 15);
-					sftd_draw_text(FONT.small, 196, 220, 0xFFFFFFFF, 11, "BGM preview");
+					sftd_draw_wtext(FONT.small, 196, 220, 0xFFFFFFFF, 11, i18n("bgm_prev").c_str());
 				}
 
 				// preview
@@ -208,35 +212,32 @@ void drawMain(gfxScreen_t screen){
 
 				if(isInstalling){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sf2d_draw_texture_part(TEXTURE.ui.tx, 65, 91, 400, 270, 269, 58);
+					sftd_draw_wtext_center(FONT.huge, 0, 240/2 - 48/2, 0xFFFFFFFF, 48, i18n("installing").c_str());
 				} else if(downloading > -1){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_text_center(FONT.huge, 0, 240/2 - 48/2, 0xFFFFFFFF, 48, "Downloading...");
+					sftd_draw_wtext_center(FONT.huge, 0, 240/2 - 48/2, 0xFFFFFFFF, 48, i18n("downloading").c_str());
 					sf2d_draw_rectangle(0, 215, downloading * 4, 25, 0xFFBC47AB);
 					sftd_draw_text_center(FONT.normal, 0, 219, 0xFFFFFFFF, 13, (to_string(downloading) + "%").c_str());
 				} else if(update.size() != 0){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_text(FONT.light, 28, 28, 0xFFFFFFFF, 24, "There's a new update!");
+					sftd_draw_wtext(FONT.light, 28, 28, 0xFFFFFFFF, 24, i18n("new_update").c_str());
 					sftd_draw_text(FONT.normal, 28, 52, 0xFFFFFFFF, 13, update.c_str());
 				} else if(deletePrompt){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, "Are you sure you want to") / 2, 56, 0xFFFFFFFF, 24, "Are you sure you want to");
-					sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, "delete this theme?") / 2, 56 + 26, 0xFFFFFFFF, 24, "delete this theme?");
+					sftd_draw_wtext_center(FONT.light, 0, 56, 0xFFFFFFFF, 24, i18n("delete_prompt_1").c_str());
+					sftd_draw_wtext_center(FONT.light, 0, 56 + 26, 0xFFFFFFFF, 24, i18n("delete_prompt_2").c_str());
 				} else if(dumpPrompt){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_text(FONT.light, 200 - sftd_get_text_width(FONT.light, 24, "Dump installed theme?") / 2, 56 + 26, 0xFFFFFFFF, 24, "Dump installed theme?");
-					sftd_draw_text(FONT.normal, 200 - sftd_get_text_width(FONT.normal, 13, "Please don't submit official themes to 3DSThem.es!") / 2, 56 + 26*2, 0x880000FF, 13, "Please don't submit official themes to 3DSThem.es!");
+					sftd_draw_wtext_center(FONT.light, 0, 56 + 26, 0xFFFFFFFF, 24, i18n("dump_prompt").c_str());
+					sftd_draw_wtext_center(FONT.normal, 0, 56 + 26*2, 0x880000FF, 13, i18n("dump_prompt_warn").c_str());
 				} else if(currentPlayingAudio || audioIsPlaying){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0x88000000);
-					sf2d_draw_texture_part(TEXTURE.ui.tx, 88, 91, 400, 328, 223, 92);
+					sftd_draw_wtext_center(FONT.huge, 0, 240/2 - 48/2, 0xFFFFFFFF, 48, i18n("playing").c_str());
 				}
 			} else if(themes.size() == 0){
-				string s = "No themes found! :(";
-				sftd_draw_text_center(FONT.light, 0, 38, 0xFFFFFFFF, 24, s.c_str());
-				s = "Go to 3DSThem.es on your computer, download some themes,";
-				sftd_draw_text_center(FONT.normal, 0, 38 + 26 + 13, 0xFFFFFFFF, 13, s.c_str());
-				s = "and put them into the /Themes folder in your SD Card.";
-				sftd_draw_text_center(FONT.normal, 0, 38 + 26 + 13*2, 0xFFFFFFFF, 13, s.c_str());
+				sftd_draw_wtext_center(FONT.light, 0, 38, 0xFFFFFFFF, 24, i18n("no_themes_1").c_str());
+				sftd_draw_wtext_center(FONT.normal, 0, 38 + 26 + 13, 0xFFFFFFFF, 13, i18n("no_themes_2").c_str());
+				sftd_draw_wtext_center(FONT.normal, 0, 38 + 26 + 13*2, 0xFFFFFFFF, 13, i18n("no_themes_3").c_str());
 			}
 		}
 	} else {
@@ -265,7 +266,7 @@ void drawMain(gfxScreen_t screen){
 					sftd_draw_text(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].title.c_str());
 				}
 			} else {
-				sftd_draw_text_center(FONT.light, 0, 240 / 2 - 12, 0xFFFFFFFF, 24, "Press START to quit.");
+				sftd_draw_wtext_center(FONT.light, 0, 240 / 2 - 12, 0xFFFFFFFF, 24, i18n("press_start").c_str());
 			}
 		}
 
@@ -278,7 +279,7 @@ void drawMain(gfxScreen_t screen){
 				if(themes[i].toShuffle)
 					selected++;
 
-			sftd_draw_text_center(FONT.normal, 0, 6, 0xFFFFFFFF, 13, (to_string(selected) + "/10 theme" + (selected != 1 ? "s" : "") + " selected for shuffle").c_str());
+			sftd_draw_wtext_center(FONT.normal, 0, 6, 0xFFFFFFFF, 13, i18n("shuffle_count", selected, i18n("plural_suffix").c_str()).c_str());
 
 			// done icon
 			if(selected > 1)
@@ -290,10 +291,10 @@ void drawMain(gfxScreen_t screen){
 			// exit icon
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 320 - 3 - 24, 3, 218, 0, 24, 24);
 
-			sftd_draw_text_center(FONT.normal, 0, 40, 0xFFFFFFFF, 13, "Scan a QR Code of a direct link to");
-			sftd_draw_text_center(FONT.normal, 0, 40 + 13*1, 0xFFFFFFFF, 13, "a ZIP file of a theme to download it.");
-			sftd_draw_text_center(FONT.normal, 0, 40 + 13*3, 0xFFFFFFFF, 13, "Go to 3DSThem.es, select a theme, then click on the");
-			sftd_draw_text_center(FONT.normal, 0, 40 + 13*4, 0xFFFFFFFF, 13, "QR Code button to see the QR Code for that particular theme.");
+			sftd_draw_wtext_center(FONT.normal, 0, 40, 0xFFFFFFFF, 13, i18n("qr_explain_1").c_str());
+			sftd_draw_wtext_center(FONT.normal, 0, 40 + 13*1, 0xFFFFFFFF, 13, i18n("qr_explain_2").c_str());
+			sftd_draw_wtext_center(FONT.normal, 0, 40 + 13*3, 0xFFFFFFFF, 13, i18n("qr_explain_3").c_str());
+			sftd_draw_wtext_center(FONT.normal, 0, 40 + 13*4, 0xFFFFFFFF, 13, i18n("qr_explain_4").c_str());
 		} else {
 			// qr icon
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 320 - 3 - 24, 3, 122, 0, 24, 24);
@@ -313,30 +314,32 @@ void drawMain(gfxScreen_t screen){
 
 		if(isInstalling || downloading > -1){
 			sf2d_draw_rectangle(0, 0, 320, 240, 0xEE000000);
-			sftd_draw_text(FONT.light, 8, 8, 0xFFFFFFFF, 24, installProgress.c_str());
+			sftd_draw_wtext(FONT.light, 8, 8, 0xFFFFFFFF, 24, installProgress.c_str());
 		} else if(update.size() != 0){
 			sf2d_draw_rectangle(0, 0, 320, 240, 0xEE000000);
-			sftd_draw_text_center(FONT.light, 0, 42, 0xFFFFFFFF, 24, "Install this update?");
+			sftd_draw_wtext_center(FONT.light, 0, 42, 0xFFFFFFFF, 24, i18n("update_prompt").c_str());
 
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 98, 669, 270, 100, 40);
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 98 + 25 + 6, 400, 0, 15, 15);
-			sftd_draw_text_center(FONT.light, 0, 103, 0xFFFFFFFF, 24, "Yes");
+			sftd_draw_wtext_center(FONT.light, 0, 103, 0xFFFFFFFF, 24, i18n("yes").c_str());
 
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 142, 669, 270, 100, 40);
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 142 + 25 + 6, 415, 0, 15, 15);
-			sftd_draw_text_center(FONT.light, 0, 147, 0xFFFFFFFF, 24, "No");
+			sftd_draw_wtext_center(FONT.light, 0, 147, 0xFFFFFFFF, 24, i18n("no").c_str());
 		} else if(deletePrompt || dumpPrompt){
 			sf2d_draw_rectangle(0, 0, 320, 240, 0xEE000000);
 
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 98 - 30, 669, 270, 100, 40);
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 98 - 30 + 25 + 6, 400, 0, 15, 15);
-			sftd_draw_text_center(FONT.light, 0, 103 - 30, 0xFFFFFFFF, 24, "Yes");
+			sftd_draw_wtext_center(FONT.light, 0, 103 - 30, 0xFFFFFFFF, 24, i18n("yes").c_str());
 
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 142 - 30, 669, 270, 100, 40);
 			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 142 - 30 + 25 + 6, 415, 0, 15, 15);
-			sftd_draw_text_center(FONT.light, 0, 147 - 30, 0xFFFFFFFF, 24, "No");
-		} else if(currentPlayingAudio || audioIsPlaying)
+			sftd_draw_wtext_center(FONT.light, 0, 147 - 30, 0xFFFFFFFF, 24, i18n("no").c_str());
+		} else if(currentPlayingAudio || audioIsPlaying){
 			sf2d_draw_rectangle(0, 0, 320, 240, 0x88000000);
+			sftd_draw_wtext_center(FONT.light, 0, 240/2 - 12, 0xFFFFFFFF, 24, i18n("stop_bgm").c_str());
+		}
 	}
 }
 
@@ -344,6 +347,7 @@ void drawLoading(gfxScreen_t screen){
 	if(screen == GFX_TOP){
 		sf2d_draw_rectangle(0, 0, 400, 240, 0xFFBC47AB);
 		sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 0, 400, 30, 400, 240);
+		sftd_draw_wtext_center(FONT.light, 0, 188, 0xFFFFFFFF, 24, i18n("scanning").c_str());
 		//sftd_draw_text(FONT.normal, 295, 73, 0xFFFFFFFF, 13, ("v" + VERSION).c_str());
 	} else {
 		sf2d_draw_rectangle(0, 0, 320, 240, getLoadingAnim());
@@ -371,7 +375,7 @@ void UI_start(){
 	res = load_png("romfs:/ui.png", &TEXTURE.ui.tx, false);
 
 	if(res)
-		throwError("Failed to load textures.");
+		throwError(i18n("err_texture"));
 
 	// font cache thingy to make text render better
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
@@ -399,9 +403,9 @@ void UI_update(){
 			sf2d_draw_rectangle(0, i, 400, 1, RGBA8(i, 0, 0, 255));
 		}
 
-		sftd_draw_text(FONT.normal, 0, 0, 0xFFFFFFFF, 13, (string("Theme machine broke. You have version ") + VERSION + ".").c_str());
-		sftd_draw_text(FONT.normal, 0, 224, 0xFFFFFFFF, 13, "Press START to quit.");
-		sftd_draw_text_wrap(FONT.normal, 0, 16, 0xFFFFFFFF, 13, 400, error.c_str());
+		sftd_draw_wtext(FONT.normal, 0, 0, 0xFFFFFFFF, 13, i18n("error_message", VERSION).c_str());
+		sftd_draw_wtext(FONT.normal, 0, 224, 0xFFFFFFFF, 13, i18n("press_start").c_str());
+		sftd_draw_wtext(FONT.normal, 0, 16, 0xFFFFFFFF, 13, wrap(error, 70).c_str());
 		sf2d_end_frame();
 		sf2d_swapbuffers();
 		return;

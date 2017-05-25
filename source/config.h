@@ -6,7 +6,7 @@
 #include "global.h"
 
 struct appConfig {
-	char lang[3];
+	string lang;
 };
 
 extern appConfig CONFIG;

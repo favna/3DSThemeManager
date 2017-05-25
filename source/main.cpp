@@ -10,6 +10,7 @@
 #include "network.h"
 #include "theme.h"
 #include "audio.h"
+#include "i18n.h"
 
 // Initiates services, starts up modules
 void start(){
@@ -60,6 +61,9 @@ void start(){
 
 	u32 theme_path[3] = {MEDIATYPE_SD, extdataID_theme, 0};
 	FSUSER_OpenArchive(&ARCHIVE_ThemeExt, ARCHIVE_EXTDATA, {PATH_BINARY, 0xC, theme_path});
+
+	// Get system language
+	CFGU_GetSystemLanguage(&lang);
 
 	// Create directory
 	FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/"), FS_ATTRIBUTE_DIRECTORY);
