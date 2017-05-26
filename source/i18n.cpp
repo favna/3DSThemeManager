@@ -5,6 +5,7 @@
 
 #include "i18n/english.cpp"
 #include "i18n/french.cpp"
+#include "i18n/german.cpp"
 
 u8 lang = 1;
 
@@ -30,6 +31,9 @@ wstring i18n(const string& token, ...){
 		case CFG_LANGUAGE_FR:
 			langMap = FRENCH;
 			break;
+		case CFG_LANGUAGE_DE:
+			langMap = GERMAN;
+			break;
 		default:
 			langMap = ENGLISH;
 			break;
@@ -49,6 +53,9 @@ wstring i18n(const string& token, ...){
 				toBeReturned = ENGLISH[token];
 	else
 		toBeReturned = langMap[token];
+
+	if(toBeReturned.size() == 0)
+		return wstring(L"");
 
 	int final_n, n = ((int)toBeReturned.size()) * 2;
 	string str;
