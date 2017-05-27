@@ -132,8 +132,12 @@ void drawMain(gfxScreen_t screen){
 		wstring s;
 		if(QRMode)
 			s = i18n("qr_scanner");
-		else
-			s = i18n("themes", themes.size(), (themes.size() != 1 ? i18n("plural_suffix") : L"").c_str());
+		else {
+			if(lang != CFG_LANGUAGE_RU)
+				s = i18n("themes", themes.size(), wstring(themes.size() != 1 ? i18n("plural_suffix") : L"").c_str());
+			else
+				s = i18n("themes", themes.size(), (themes.size() == 1 ? L"а" : themes.size() < 5 ? L"ы" : L""));
+		}
 		sftd_draw_wtext(FONT.normal, 400 - sftd_get_wtext_width(FONT.normal, 13, s.c_str()) - 8, 5, 0xFFFFFFFF, 13, s.c_str());
 
 		if(!QRMode){
@@ -142,17 +146,20 @@ void drawMain(gfxScreen_t screen){
 				sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
 
 				// description
-				istringstream iss(wrap(themes[currentSelectedItem].description, 30));
 				string desc = "";
-				for (size_t i = 0; i < 6; i++){
-					string line;
+				if(themes[currentSelectedItem].description != "no desc"){
+					istringstream iss(wrap(themes[currentSelectedItem].description, 30));
+					for (size_t i = 0; i < 6; i++){
+						string line;
 
-					if(!getline(iss, line))
-						break;
+						if(!getline(iss, line))
+							break;
 
-					desc += (i ? "\n" : "") + line;
-				}
-				sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, desc.c_str());
+						desc += (i ? "\n" : "") + line;
+					}
+					sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, desc.c_str());
+				} else
+					sftd_draw_wtext(FONT.normal, 178, 70, 0xFFFFFFFF, 13, i18n("no_desc").c_str());
 
 				// author
 				int authorY = (count(desc.begin(), desc.end(), L'\n') + 1) * 14;
@@ -279,7 +286,10 @@ void drawMain(gfxScreen_t screen){
 				if(themes[i].toShuffle)
 					selected++;
 
-			sftd_draw_wtext_center(FONT.normal, 0, 6, 0xFFFFFFFF, 13, i18n("shuffle_count", selected, i18n("plural_suffix").c_str()).c_str());
+			if(lang != CFG_LANGUAGE_RU)
+				sftd_draw_wtext_center(FONT.normal, 0, 6, 0xFFFFFFFF, 13, i18n("shuffle_count", selected, wstring(selected != 1 ? i18n("plural_suffix") : L"").c_str()).c_str());
+			else
+				sftd_draw_wtext_center(FONT.normal, 0, 6, 0xFFFFFFFF, 13, i18n("shuffle_count", selected, (selected < 2 ? L"а" : selected < 5 ? L"ы" : L"")).c_str());
 
 			// done icon
 			if(selected > 1)

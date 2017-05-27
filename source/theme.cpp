@@ -21,7 +21,7 @@ void loadTheme(void* entryVP){
 			Theme theme = {
 				u16tstr(entry->name, 0x106),
 				u16tstr(entry->name, 0x106),
-				ws2s(i18n("no_desc")),
+				"no desc",
 				ws2s(i18n("unknown")),
 				NULL,
 				NULL,
@@ -135,7 +135,7 @@ void loadTheme(void* entryVP){
 		Theme theme = {
 			u16tstr(entry->name, 0x106),
 			u16tstr(entry->name, 0x106),
-			ws2s(i18n("no_desc")),
+			"no desc",
 			ws2s(i18n("unknown")),
 			NULL,
 			NULL,
