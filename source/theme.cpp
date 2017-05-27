@@ -272,10 +272,14 @@ void scanThemes(void*){
 
 	FSDIR_Close(themeDir);
 
-	sort(entries.begin(), entries.end(), sortDirectoryEntriesByName);
+	if(entries.size() == 0)
+		themesScanned = true;
+	else {
+		sort(entries.begin(), entries.end(), sortDirectoryEntriesByName);
 
-	for (size_t i = 0; i < entries.size(); i++)
-		queueTask(loadTheme, (void*)entries[i], false);
+		for (size_t i = 0; i < entries.size(); i++)
+			queueTask(loadTheme, (void*)entries[i], false);
+	}
 }
 
 void loadPreview(void* id){
