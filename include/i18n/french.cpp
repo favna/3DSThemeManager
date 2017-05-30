@@ -17,7 +17,7 @@ std::map<std::string, std::wstring> FRENCH = {
 	{"remove_from_shuffle", L"Retirer des thèmes aléatoires"},
 	{"install",             L"Installer"},
 	{"w_o_bgm",             L"sans musique"},
-	{"fullscreen_prev",     L"Aperçu en plain écran"},
+	{"fullscreen_prev",     L"Aperçu en plein écran"},
 	{"hold_delete",         L"[maintenir] effacer"},
 	{"bgm_prev",            L"Aperçu de la musique"},
 	{"installing",          L"Installation en cours..."},

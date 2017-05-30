@@ -36,7 +36,7 @@ std::map<std::string, std::wstring> GERMAN = {
 	{"shuffle_count",       L"%i/10 Themes für Shuffle ausgewählt.%ls"},
 	{"qr_explain_1",        L"Scanne einen QR-Code mit dem direkten Link"},
 	{"qr_explain_2",        L"zu einer ZIP Datei von einem Theme, um es zu downloaden."},
-	{"qr_explain_3",        L"Gehe zu 3dsthem.es und clicke auf den"},
+	{"qr_explain_3",        L"Gehe zu 3dsthem.es und klicke auf den"},
 	{"qr_explain_4",        L"QR-Code Knopf um den QR-Code für das Theme zu sehen."},
 	{"update_prompt",       L"Dieses Update installieren?"},
 	{"yes",                 L"Ja"},
