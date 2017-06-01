@@ -13,7 +13,7 @@
 
 u8 lang = 1;
 
-wstring i18n(const string& token, ...){
+wstring i18n(const string& token){
 	map<string, wstring> langMap;
 
 	/*
@@ -55,8 +55,6 @@ wstring i18n(const string& token, ...){
 			break;
 	}
 
-	wstring toBeReturned;
-
 	if(langMap.find(token) == langMap.end())
 		if(langMap == ENGLISH){
 			string toBeConverted = string(token);
@@ -66,30 +64,7 @@ wstring i18n(const string& token, ...){
 				string toBeConverted = string(token);
 				return wstring(toBeConverted.begin(), toBeConverted.end());
 			} else
-				toBeReturned = ENGLISH[token];
+				return ENGLISH[token];
 	else
-		toBeReturned = langMap[token];
-
-	if(toBeReturned.size() == 0)
-		return wstring(L"");
-
-	int final_n, n = ((int)toBeReturned.size()) * 2;
-	string str;
-	unique_ptr<wchar_t[]> formatted;
-	va_list ap;
-
-	while(1){
-		formatted.reset(new wchar_t[n]);
-		wcscpy(&formatted[0], toBeReturned.c_str());
-		va_start(ap, toBeReturned);
-		final_n = vswprintf(&formatted[0], n, toBeReturned.c_str(), ap);
-		va_end(ap);
-
-		if(final_n < 0 || final_n >= n)
-			n += abs(final_n - n + 1);
-		else
-			break;
-	}
-
-	return wstring(formatted.get());
+		return langMap[token];
 }
