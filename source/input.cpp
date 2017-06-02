@@ -24,7 +24,7 @@ bool checkTouch(int ax1, int ay1, int ax2, int ay2){
 void INPUT_handle(){
 	hidScanInput();
 
-	if(isError || isInstalling || themes.size() == 0 || !themesScanned || downloading > -1)
+	if(isError || isInstalling || !themesScanned || downloading > -1)
 		return;
 
 	u32 kDown = hidKeysDown();
@@ -81,7 +81,7 @@ void INPUT_handle(){
 
 	if(themesScanned){
 		if(previewX == 8.f){
-			if(!QRMode){
+			if(!QRMode && themes.size() != 0){
 				if(kDown & KEY_Y)
 					toggleBGM();
 
@@ -166,7 +166,7 @@ void INPUT_handle(){
 			}
 		}
 
-		if(kUp & KEY_X && !QRMode)
+		if(kUp & KEY_X && !QRMode && themes.size() != 0)
 			if((previewX == 8.f || previewX == 0.f) && themes[currentSelectedItem].hasPreview)
 				toggleFullscreen();
 	}
