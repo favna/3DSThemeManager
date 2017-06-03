@@ -32,6 +32,7 @@ extern textureList TEXTURE;
 extern fontList FONT;
 
 extern int currentSelectedItem;
+extern int updateTextOffset;
 
 extern float previewX;
 

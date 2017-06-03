@@ -43,12 +43,19 @@ void INPUT_handle(){
 	if(update.size() != 0){
 		if(kDown & KEY_A){
 			update = "Updating...";
+			updateTextOffset = 0;
 			UI_update();
 			installUpdate();
 		}
 
 		if(kDown & KEY_B)
 			update = "";
+
+		if(kHeld & KEY_CPAD_DOWN)
+			updateTextOffset = fmax(((count(update.begin(), update.end(), '\n') + 1) * 13 - 200) * -1, updateTextOffset + circlePos.dy / 10);
+
+		if(kHeld & KEY_CPAD_UP && updateTextOffset != 0)
+			updateTextOffset = fmin(0, updateTextOffset + circlePos.dy / 10);
 
 		return;
 	}

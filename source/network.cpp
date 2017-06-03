@@ -138,36 +138,53 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 void checkForUpdate(void*){
 	vector<char> httpData;
 	bool bleeding = string(VERSION).substr(string(VERSION).find("-") + 1) == "git";
-	Result ret = HTTPGet(httpData, string("https://api.github.com/repos/ErmanSayin/Themely") + (bleeding ? "-bleeding" : "") + "/releases/latest");
+	Result ret = HTTPGet(httpData, string("https://api.github.com/repos/ErmanSayin/Themely") + (bleeding ? "-bleeding" : "") + "/releases");
 	if(ret){
 		printf("Failed to check for an update.\n");
 		return;
 	}
 
-	json latestRelease;
+	json releases;
 
 	try {
-		latestRelease = json::parse(httpData);
+		releases = json::parse(httpData);
 	} catch (...) {
 		printf("Failed to check for an update.\n");
 		return;
 	}
 
-	if((!bleeding && latestRelease["tag_name"] != string("v") + VERSION) || (bleeding && latestRelease["tag_name"] != string(VERSION).substr(0, string(VERSION).find("-git")))){
-		update = latestRelease["body"];
+	if((!bleeding && releases[0]["tag_name"] != string("v") + VERSION) || (bleeding && releases[0]["tag_name"] != string(VERSION).substr(0, string(VERSION).find("-git")))){
+		update = string("You have Themely version ") + VERSION + ".\n\n";
+		update += releases[0]["tag_name"];
+		update += ":\n";
+		update += releases[0]["body"];
 		update = update.substr(0, update.find("GBATemp thread:"));
 
-		for (size_t i = 0; i < latestRelease["assets"].size(); i++){
-			string name = latestRelease["assets"][i]["name"];
+		for (size_t i = 0; i < releases[0]["assets"].size(); i++){
+			string name = releases[0]["assets"][i]["name"];
 			if(
 				(envIsHomebrew() && name.substr(name.find(".") + 1) == "3dsx") ||
 				(!envIsHomebrew() && name.substr(name.find(".") + 1) == "cia")
 			)
-				updateDownloadURL = latestRelease["assets"][i]["browser_download_url"];
+				updateDownloadURL = releases[0]["assets"][i]["browser_download_url"];
 		}
 
-		if(updateDownloadURL.size() == 0)
+		if(updateDownloadURL.size() == 0){
 			update = "";
+			return;
+		}
+
+		update += "----------CHANGELOG----------\n\n";
+
+		for (size_t i = 0; i < releases.size(); i++){
+			if((!bleeding && releases[i]["tag_name"] == string("v") + VERSION) || (bleeding && releases[i]["tag_name"] == string(VERSION).substr(0, string(VERSION).find("-git"))))
+				update += "[CURRENT] ";
+
+			update += releases[i]["tag_name"];
+			update += ":\n";
+			update += releases[i]["body"];
+			update = update.substr(0, update.find("GBATemp thread:"));
+		}
 	}
 }
 

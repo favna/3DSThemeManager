@@ -14,6 +14,7 @@ fontList FONT;
 
 int currentSelectedItem = 0;
 int themeListOffset = 0;
+int updateTextOffset = 0;
 
 int timer;
 
@@ -227,8 +228,8 @@ void drawMain(gfxScreen_t screen){
 					sftd_draw_text_center(FONT.normal, 0, 219, 0xFFFFFFFF, 13, (to_string(downloading) + "%").c_str());
 				} else if(update.size() != 0){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_wtext(FONT.light, 28, 28, 0xFFFFFFFF, 24, i18n("new_update").c_str());
-					sftd_draw_text(FONT.normal, 28, 52, 0xFFFFFFFF, 13, update.c_str());
+					sftd_draw_wtext(FONT.light, 14, 14 + updateTextOffset, 0xFFFFFFFF, 24, i18n("new_update").c_str());
+					sftd_draw_text(FONT.normal, 14, 14 + 24 + updateTextOffset, 0xFFFFFFFF, 13, update.c_str());
 				} else if(deletePrompt){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
 					sftd_draw_wtext_center(FONT.light, 0, 56, 0xFFFFFFFF, 24, i18n("delete_prompt_1").c_str());
