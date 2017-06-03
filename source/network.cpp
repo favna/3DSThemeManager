@@ -159,6 +159,8 @@ void checkForUpdate(void*){
 		update += ":\n";
 		update += releases[0]["body"];
 		update = update.substr(0, update.find("GBATemp thread:"));
+		if(bleeding)
+			update += "\n\n";
 
 		for (size_t i = 0; i < releases[0]["assets"].size(); i++){
 			string name = releases[0]["assets"][i]["name"];
@@ -174,9 +176,9 @@ void checkForUpdate(void*){
 			return;
 		}
 
-		update += "----------CHANGELOG----------\n\n";
+		update += "--------------------------------------------------CHANGELOG--------------------------------------------------\n\n";
 
-		for (size_t i = 0; i < releases.size(); i++){
+		for (size_t i = 1; i < releases.size(); i++){
 			if((!bleeding && releases[i]["tag_name"] == string("v") + VERSION) || (bleeding && releases[i]["tag_name"] == string(VERSION).substr(0, string(VERSION).find("-git"))))
 				update += "[CURRENT] ";
 
@@ -184,6 +186,8 @@ void checkForUpdate(void*){
 			update += ":\n";
 			update += releases[i]["body"];
 			update = update.substr(0, update.find("GBATemp thread:"));
+			if(bleeding)
+				update += "\n\n";
 		}
 	}
 }
