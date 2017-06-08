@@ -134,9 +134,9 @@ void INPUT_handle(){
 					} else {
 						isInstalling = true;
 						if(kHeld & KEY_R)
-							queueTask(installTheme, (void*)true);
+							queueTask(installTheme, (void*)true, true);
 						else
-							queueTask(installTheme, (void*)false);
+							queueTask(installTheme, (void*)false, true);
 					}
 				}
 			}
@@ -151,7 +151,7 @@ void INPUT_handle(){
 
 						if(selected > 1){
 							isInstalling = true;
-							queueTask(installShuffle, (void*)0);
+							queueTask(installShuffle, (void*)0, true);
 						}
 					}
 

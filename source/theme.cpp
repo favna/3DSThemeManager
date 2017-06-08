@@ -607,70 +607,13 @@ void installShuffle(void*){
 	installProgress = i18n("install_reading", "body_LZ.bin\n& BGM.bcstm");
 
 	Result ret = 0;
-	vector<vector<char>> bodyData;
-	vector<vector<char>> BGMData;
-	int themeCount = 0;
+	vector<int> themesToBeShuffled;
+	vector<int> themesToBeShuffled_bodySize;
+	vector<int> themesToBeShuffled_BGMSize;
 
-	for (size_t i = 0; i < themes.size(); i++){
-		if(themes[i].toShuffle){
-			themeCount++;
-
-			// Load data
-			if(!themes[i].isZip){
-				vector<char> tmpBodyData;
-				if(fileToVector(string("/Themes/") + themes[i].fileName + "/body_LZ.bin", tmpBodyData))
-					return throwError(L"Failed to open body_LZ.bin file");
-
-				bodyData.push_back(tmpBodyData);
-				vector<char> tmpBGMData;
-
-				if(!themes[i].shuffleNoBGM)
-					fileToVector(string("/Themes/") + themes[i].fileName + "/bgm.bcstm", tmpBGMData);
-
-				BGMData.push_back(tmpBGMData);
-			} else {
-				unzFile zipFile = unzOpen(string("/Themes/" + string(themes[i].fileName)).c_str());
-
-				if(!zipFile)
-					return throwError(L"Failed to open ZIP file");
-
-				if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0))
-					return throwError(L"Can't find body_LZ.bin file in ZIP");
-
-				if(unzOpenCurrentFile(zipFile))
-					return throwError(L"Can't open body_LZ.bin file in ZIP");
-
-				vector<char> tmpBodyData;
-				ret = zippedFileToVector(zipFile, tmpBodyData);
-				if(ret)
-					return throwError(string(string("Can't read body_LZ.bin from ZIP -- error code ") + to_string(ret)).c_str());
-
-				unzCloseCurrentFile(zipFile);
-
-				bodyData.push_back(tmpBodyData);
-				vector<char> tmpBGMData;
-
-				if(!themes[i].shuffleNoBGM && !unzLocateFile(zipFile, "bgm.bcstm", 0)){
-					if(unzOpenCurrentFile(zipFile))
-						return throwError(L"Can't open bgm.bcstm file in ZIP");
-
-					ret = zippedFileToVector(zipFile, tmpBGMData);
-					if(ret)
-						return throwError(string(string("Can't read bgm.bcstm from ZIP -- error code ") + to_string(ret)).c_str());
-
-					unzCloseCurrentFile(zipFile);
-				}
-
-				BGMData.push_back(tmpBGMData);
-
-				unzClose(zipFile);
-			}
-		}
-	}
-
-	for (size_t i = 0; i < themeCount; i++) {
-		printf("%i: %i, %i\n", i, bodyData[i].size(), BGMData[i].size());
-	}
+	for (size_t i = 0; i < themes.size(); i++)
+		if(themes[i].toShuffle)
+			themesToBeShuffled.push_back(i);
 
 	// Update SaveData.dat
 	u8* saveDataDat_buf;
@@ -703,7 +646,7 @@ void installShuffle(void*){
 
 		for (size_t i = 0; i < 10; i++) {
 			memset(&saveDataDat_buf[0x13C0 + 0x8 * i], 0, 8);
-			if(themeCount > i){
+			if(themesToBeShuffled.size() > i){
 				saveDataDat_buf[0x13C0 + 0x8 * i] = i;
 				saveDataDat_buf[0x13C0 + 0x8 * i + 5] = 3;
 			}
@@ -730,8 +673,34 @@ void installShuffle(void*){
 	installProgress += wstring(L"\n") + i18n("install_writing", "BodyCache_rd.bin");
 
 	for (size_t i = 0; i < 10; i++) {
-		if(themeCount > i){
-			if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, &bodyData[i][0], bodyData[i].size(), FS_WRITE_FLUSH))
+		if(themesToBeShuffled.size() > i){
+			vector<char> tmpBodyData;
+			if(!themes[themesToBeShuffled[i]].isZip){
+				if(fileToVector(string("/Themes/") + themes[themesToBeShuffled[i]].fileName + "/body_LZ.bin", tmpBodyData))
+					return throwError(L"Failed to open body_LZ.bin file");
+			} else {
+				unzFile zipFile = unzOpen(string("/Themes/" + string(themes[themesToBeShuffled[i]].fileName)).c_str());
+
+				if(!zipFile)
+					return throwError(L"Failed to open ZIP file");
+
+				if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0))
+					return throwError(L"Can't find body_LZ.bin file in ZIP");
+
+				if(unzOpenCurrentFile(zipFile))
+					return throwError(L"Can't open body_LZ.bin file in ZIP");
+
+				ret = zippedFileToVector(zipFile, tmpBodyData);
+				if(ret)
+					return throwError(string(string("Can't read body_LZ.bin from ZIP -- error code ") + to_string(ret)).c_str());
+
+				unzCloseCurrentFile(zipFile);
+				unzClose(zipFile);
+			}
+
+			themesToBeShuffled_bodySize.push_back(tmpBodyData.size());
+
+			if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, &tmpBodyData[0], tmpBodyData.size(), FS_WRITE_FLUSH))
 				return throwError(i18n("err_fail_write", "BodyCache_rd.bin") + wstring(L" ") + i18n("err_try_default"));
 		} else {
 			char* empty = new char[0x150000]();
@@ -756,9 +725,40 @@ void installShuffle(void*){
 				return throwError(i18n("err_fail_open", "BgmCache_0" + to_string(i) + ".bin") + wstring(L" ") + i18n("err_try_default"));
 		}
 
-		if(themeCount > i && BGMData[i].size() != 0)
-			ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, &BGMData[i][0], BGMData[i].size(), FS_WRITE_FLUSH);
-		else {
+		if(themesToBeShuffled.size() > i && !themes[themesToBeShuffled[i]].shuffleNoBGM){
+			vector<char> tmpBGMData;
+			if(!themes[themesToBeShuffled[i]].isZip){
+				fileToVector(string("/Themes/") + themes[themesToBeShuffled[i]].fileName + "/bgm.bcstm", tmpBGMData);
+			} else {
+				unzFile zipFile = unzOpen(string("/Themes/" + string(themes[themesToBeShuffled[i]].fileName)).c_str());
+
+				if(!zipFile)
+					return throwError(L"Failed to open ZIP file");
+
+				if(!unzLocateFile(zipFile, "bgm.bcstm", 0)){
+					if(unzOpenCurrentFile(zipFile))
+						return throwError(L"Can't open bgm.bcstm file in ZIP");
+
+					ret = zippedFileToVector(zipFile, tmpBGMData);
+					if(ret)
+						return throwError(string(string("Can't read bgm.bcstm from ZIP -- error code ") + to_string(ret)).c_str());
+
+					unzCloseCurrentFile(zipFile);
+				}
+
+				unzClose(zipFile);
+			}
+
+			themesToBeShuffled_BGMSize.push_back(tmpBGMData.size());
+
+			if(tmpBGMData.size() == 0){
+				char* empty = new char[3371008]();
+				ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, empty, (u64)3371008, FS_WRITE_FLUSH);
+				delete[] empty;
+			} else {
+				ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, &tmpBGMData[0], tmpBGMData.size(), FS_WRITE_FLUSH);
+			}
+		} else {
 			char* empty = new char[3371008]();
 			ret = FSFILE_Write(bgmCacheBin_handle, nullptr, 0, empty, (u64)3371008, FS_WRITE_FLUSH);
 			delete[] empty;
@@ -805,9 +805,9 @@ void installShuffle(void*){
 	for (size_t i = 0; i < 10; i++) {
 		u32* bodySize_loc = (u32*)(&themeManageBin_buf[0x338 + 4 * i]);
 		u32* BGMSize_loc = (u32*)(&themeManageBin_buf[0x360 + 4 * i]);
-		if(themeCount > i){
-			*bodySize_loc = (u32)bodyData[i].size();
-			*BGMSize_loc = (u32)BGMData[i].size();
+		if(themesToBeShuffled.size() > i){
+			*bodySize_loc = (u32)themesToBeShuffled_bodySize[i];
+			*BGMSize_loc = (u32)themesToBeShuffled_BGMSize[i];
 		} else {
 			*bodySize_loc = (u32)0;
 			*BGMSize_loc = (u32)0;
