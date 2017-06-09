@@ -11,6 +11,9 @@
 #include "camera.h"
 #include "i18n.h"
 
+#include <sftd.h>
+#include <sfil.h>
+
 struct texture {
 	sf2d_texture* tx;
 	bool loaded;
@@ -40,8 +43,8 @@ void UI_start();
 void UI_cleanup();
 void UI_update();
 
-Result load_png(string, sf2d_texture**, bool safe = true);
-Result load_png_mem(vector<char>&, sf2d_texture**, bool safe = true);
+Result load_png(string, sf2d_texture**);
+Result load_png_mem(vector<char>&, sf2d_texture**);
 
 void selectTheme(int);
 void toggleFullscreen();

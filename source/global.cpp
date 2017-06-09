@@ -154,10 +154,10 @@ int fileToVector(string path, vector<char>& vector){
 
 int zippedFileToVector(unzFile zipFile, vector<char>& vector){
 	int err = 0;
-	char* tmp_buf = new char[1024];
+	char* tmp_buf = new char[8192];
 
 	do {
-		err = unzReadCurrentFile(zipFile, tmp_buf, 1024);
+		err = unzReadCurrentFile(zipFile, tmp_buf, 8192);
 
 		if(err < 0){
 			if(tmp_buf)
@@ -165,7 +165,7 @@ int zippedFileToVector(unzFile zipFile, vector<char>& vector){
 
 			return -1;
 		} else
-			for (int i = 0; i < (int)err; i++) vector.push_back(tmp_buf[i]);
+			vector.insert(vector.end(), tmp_buf, tmp_buf + err);
 	} while(err > 0);
 
 	if(tmp_buf)

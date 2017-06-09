@@ -283,6 +283,9 @@ void scanThemes(void*){
 }
 
 void loadPreview(void* id){
+	if(!themes[(int)id].hasPreview)
+		return;
+
 	if(!themes[(int)id].isZip){
 		while (true){
 			if(!LightLock_TryLock(&themes[(int)id].lock))
@@ -359,6 +362,9 @@ void loadPreview(void* id){
 
 void checkInfosToBeLoaded(int id){
 	for (int i = 0; i < themes.size(); i++){
+		if(!themes[i].hasPreview)
+			continue;
+
 		if(i < (id - 4) || i > (id + 4)){
 			// just in case the user is scrolling too fast
 			while (true){

@@ -2,12 +2,6 @@
 // Copyright (c) 2017 Erman SAYIN
 
 #include "ui.h"
-#define STBI_NO_STDIO
-#define STBI_NO_LINEAR
-#define STBI_NO_HDR
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_PNG
-#include "lib/stb_image.h"
 
 textureList TEXTURE;
 fontList FONT;
@@ -43,35 +37,8 @@ u32 getLoadingAnim(){
 	return rainbow[loadingAnimTimer];
 }
 
-Result load_png(string filename, sf2d_texture** texture, bool safe){
-	// thx MarcusD
-	vector<char> buffer;
-	fileToVector(string(filename), buffer);
-
-	void* ob = 0;
-	int x = 0;
-	int y = 0;
-
-	if(safe){
-		stbi_info_from_memory((const unsigned char*)&buffer[0], buffer.size(), &x, &y, 0);
-
-		if(x == 0 || x > 412 || y == 0 || y > 482)
-			return -1;
-	}
-
-	try {
-		ob = stbi_load_from_memory((const unsigned char*)&buffer[0], buffer.size(), &x, &y, 0, 4);
-	} catch (...){
-		return -1;
-	}
-
-	if(!ob){
-		printf("fail: %s\n", stbi_failure_reason());
-		return -1;
-	}
-
-	*texture = sf2d_create_texture_mem_RGBA8((void*)ob, x, y, TEXFMT_RGBA8, SF2D_PLACE_RAM);
-	free(ob);
+Result load_png(string filename, sf2d_texture** texture){
+	*texture = sfil_load_PNG_file(filename.c_str(), SF2D_PLACE_RAM);
 
 	if(!texture)
 		return -1;
@@ -79,31 +46,11 @@ Result load_png(string filename, sf2d_texture** texture, bool safe){
 	return 0;
 }
 
-Result load_png_mem(vector<char>& data, sf2d_texture** texture, bool safe){
-	void* ob = 0;
-	int x = 0;
-	int y = 0;
-
-	if(safe){
-		stbi_info_from_memory((const unsigned char*)&data[0], data.size(), &x, &y, 0);
-
-		if(x == 0 || x > 412 || y == 0 || y > 482)
-			return -1;
-	}
-
-	try {
-		ob = stbi_load_from_memory((const unsigned char*)&data[0], data.size(), &x, &y, 0, 4);
-	} catch (...){
+Result load_png_mem(vector<char>& data, sf2d_texture** texture){
+	if(data.size() < 67)
 		return -1;
-	}
 
-	if(!ob){
-		printf("fail: %s\n", stbi_failure_reason());
-		return -1;
-	}
-
-	*texture = sf2d_create_texture_mem_RGBA8((void*)ob, x, y, TEXFMT_RGBA8, SF2D_PLACE_RAM);
-	free(ob);
+	*texture = sfil_load_PNG_buffer(&data[0], SF2D_PLACE_RAM);
 
 	if(!texture)
 		return -1;
@@ -383,7 +330,7 @@ void UI_start(){
 	TEXTURE.ui = {NULL, true};
 
 	Result res;
-	res = load_png("romfs:/ui.png", &TEXTURE.ui.tx, false);
+	res = load_png("romfs:/ui.png", &TEXTURE.ui.tx);
 
 	if(res)
 		throwError(i18n("err_texture"));

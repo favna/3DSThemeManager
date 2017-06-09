@@ -20,6 +20,7 @@ void start(){
 	Result ret;
 
 	APT_SetAppCpuTimeLimit(80);
+	osSetSpeedupEnable(true);
 
 	// Initiate services
 	romfsInit();

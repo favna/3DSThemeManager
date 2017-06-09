@@ -26,7 +26,7 @@ SOURCE_DIRS := source
 EXTRA_OUTPUT_FILES :=
 
 LIBRARY_DIRS := $(DEVKITPRO)/libctru $(PORTLIBS)
-LIBRARIES := vorbisidec ogg sf2d sftd freetype png citro3d ctru z
+LIBRARIES := vorbisidec ogg sfil sftd sf2d freetype png citro3d ctru z
 
 BUILD_FLAGS := -DVERSION='"1.2.1"' -Ofast
 RUN_FLAGS :=
