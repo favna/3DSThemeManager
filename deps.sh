@@ -12,7 +12,7 @@ make zlib;
 make install-zlib;
 make libogg;
 make install;
-make libpng freetype tremor;
+make libjpeg-turbo libpng freetype tremor;
 sudo -E make install;
 cd ..;
 
