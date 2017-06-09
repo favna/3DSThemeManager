@@ -30,10 +30,22 @@ void loadTheme(void* entryVP){
 				true,
 				false,
 				fileExists(u"/Themes/" + u16string((char16_t*)entry->name) + u"/bgm.ogg"),
-				fileExists(u"/Themes/" + u16string((char16_t*)entry->name) + u"/Preview.png")
+				false
 			};
 
 			LightLock_Init(&theme.lock);
+
+			if(fileExists(u"/Themes/" + u16string((char16_t*)entry->name) + u"/Preview.png")){
+				vector<char> tmp_buf;
+
+				if(!fileToVector("/Themes/" + u16tstr(entry->name, 0x106) + "/Preview.png", tmp_buf, 24)){
+					int width = (tmp_buf[16]<<24) + (tmp_buf[17]<<16) + (tmp_buf[18]<<8) + (tmp_buf[19]<<0);
+					int height = (tmp_buf[20]<<24) + (tmp_buf[21]<<16) + (tmp_buf[22]<<8) + (tmp_buf[23]<<0);
+
+					if(width <= 412 && height <= 482)
+						theme.hasPreview = true;
+				}
+			}
 
 			ifstream smdhFile("/Themes/" + theme.fileName + "/info.smdh", ios::in | ios::binary);
 			if(smdhFile.is_open()){
@@ -154,8 +166,20 @@ void loadTheme(void* entryVP){
 			theme.hasBGM = true;
 
 		// check if preview exists
-		if(!unzLocateFile(zipFile, "Preview.png", 0) || !unzLocateFile(zipFile, "preview.png", 0))
-			theme.hasPreview = true;
+		if((!unzLocateFile(zipFile, "Preview.png", 0) || !unzLocateFile(zipFile, "preview.png", 0)) && !unzOpenCurrentFile(zipFile)){
+			char* tmp_buf = new char[24];
+			int err = unzReadCurrentFile(zipFile, tmp_buf, 24);
+			if(err == 24){
+				int width = (tmp_buf[16]<<24) + (tmp_buf[17]<<16) + (tmp_buf[18]<<8) + (tmp_buf[19]<<0);
+				int height = (tmp_buf[20]<<24) + (tmp_buf[21]<<16) + (tmp_buf[22]<<8) + (tmp_buf[23]<<0);
+
+				if(width <= 412 && height <= 482)
+					theme.hasPreview = true;
+			}
+
+			delete[] tmp_buf;
+			unzCloseCurrentFile(zipFile);
+		}
 
 		if(!unzLocateFile(zipFile, "info.smdh", 0)){
 			if(!unzOpenCurrentFile(zipFile)){

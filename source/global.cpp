@@ -133,11 +133,11 @@ u16string strtu16str(string& str){
 	return u16string(out, min(len, str.size()));
 }
 
-int fileToVector(string path, vector<char>& vector){
+int fileToVector(string path, vector<char>& vector, int maxSize){
 	ifstream file(path, ios::in | ios::binary);
 	if(file.is_open()){
 		file.seekg(0, ios_base::end);
-		streampos fileSize = file.tellg();
+		int fileSize = maxSize <= 0 ? (int)file.tellg() : maxSize;
 		if(fileSize > vector.size())
 			vector.resize(fileSize);
 
