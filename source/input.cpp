@@ -7,6 +7,8 @@ touchPosition initialTouch;
 touchPosition lastTouch;
 
 int XHeldLength = 0;
+int UpHeldLength = 0;
+int DownHeldLength = 0;
 
 bool checkTouch(int ax1, int ay1, int ax2, int ay2){
 	int ix = initialTouch.px;
@@ -103,11 +105,21 @@ void INPUT_handle(){
 				if(XHeldLength >= 15)
 					deletePrompt = true;
 
-				if(kDown & KEY_DOWN)
+				if(kDown & KEY_DOWN || (DownHeldLength > 10 && DownHeldLength % 10 == 0))
 					selectTheme(currentSelectedItem + 1);
 
-				if(kDown & KEY_UP)
+				if(kDown & KEY_DOWN || kHeld & KEY_DOWN)
+					DownHeldLength++;
+				else
+					DownHeldLength = 0;
+
+				if(kDown & KEY_UP || (UpHeldLength > 10 && UpHeldLength % 10 == 0))
 					selectTheme(currentSelectedItem - 1);
+
+				if(kDown & KEY_UP || kHeld & KEY_UP)
+					UpHeldLength++;
+				else
+					UpHeldLength = 0;
 
 				if(kDown & KEY_LEFT)
 					selectTheme(max(0, currentSelectedItem - 5));
