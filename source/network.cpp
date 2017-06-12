@@ -197,7 +197,7 @@ void installUpdate(){
 		vector<char> threedsxData;
 		Result ret = HTTPGet(threedsxData, updateDownloadURL);
 		if(ret)
-			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_manual"));
+			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_manual"), ret);
 
 		Handle threedsxHandle;
 		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely.3dsx"));
@@ -205,7 +205,7 @@ void installUpdate(){
 		if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"), 0, (u64)threedsxData.size()))
 			return throwError("Failed to create Themely.3dsx");
 
-		if(FSUSER_OpenFile(&threedsxHandle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0))
+		if(FSUSER_OpenFile(&threedsxHandle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"), FS_OPEN_WRITE, 0))
 			return throwError("Failed to open Themely.3dsx");
 
 		if(FSFILE_Write(threedsxHandle, nullptr, 0, &threedsxData[0], (u64)threedsxData.size(), FS_WRITE_FLUSH))
