@@ -39,15 +39,16 @@ extern u64 ARCHIVE_HomeExt;
 extern u64 ARCHIVE_ThemeExt;
 
 extern bool isError;
+extern bool errorIsFatal;
 extern wstring error;
 
-void throwError(string);
-void throwError(wstring);
+void throwError(string, Result res = 0, bool fatal = false);
+void throwError(wstring, Result res = 0, bool fatal = false);
 
 wstring s2ws(const string&);
 string ws2s(const wstring&);
-string wrap(const string, size_t);
-wstring wrap(const wstring, size_t);
+string wrap(string, size_t);
+wstring wrap(wstring, size_t);
 int numOfDigits(const string);
 
 bool fileExists(u16string);

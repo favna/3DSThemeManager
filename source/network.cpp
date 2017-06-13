@@ -197,26 +197,26 @@ void installUpdate(){
 		vector<char> threedsxData;
 		Result ret = HTTPGet(threedsxData, updateDownloadURL);
 		if(ret)
-			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_manual"), ret);
+			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_manual"), ret, true);
 
 		Handle threedsxHandle;
 		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely.3dsx"));
 		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"));
 		if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"), 0, (u64)threedsxData.size()))
-			return throwError("Failed to create Themely.3dsx");
+			return throwError("Failed to create Themely.3dsx", 0, true);
 
 		if(FSUSER_OpenFile(&threedsxHandle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"), FS_OPEN_WRITE, 0))
-			return throwError("Failed to open Themely.3dsx");
+			return throwError("Failed to open Themely.3dsx", 0, true);
 
 		if(FSFILE_Write(threedsxHandle, nullptr, 0, &threedsxData[0], (u64)threedsxData.size(), FS_WRITE_FLUSH))
-			return throwError("Failed to write to Themely.3dsx.");
+			return throwError("Failed to write to Themely.3dsx.", 0, true);
 
 		FSFILE_Close(threedsxHandle);
 	} else {
 		vector<char> ciaData;
 		Result ret = HTTPGet(ciaData, updateDownloadURL);
 		if(ret)
-			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_titledb"));
+			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_titledb"), ret, true);
 
 		amInit();
 		Handle handle;
@@ -236,8 +236,7 @@ void downloadThemeFromURL(void* url){
 	Result ret = HTTPGet(zipData, string((char*)url), &fileName, &downloading);
 	if(ret){
 		downloading = -1;
-		// TODO: make this non-fatal
-		return throwError(i18n("err_zip_dl_fail"));
+		return throwError(i18n("err_zip_dl_fail"), ret);
 	}
 
 	if(fileName.size() == 0){
@@ -253,24 +252,36 @@ void downloadThemeFromURL(void* url){
 	// store it temporarily
 	Handle tmpZip_handle;
 	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"));
-	if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), 0, (u64)zipData.size()))
-		return throwError("Failed to create temporary ZIP file");
+	ret = FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), 0, (u64)zipData.size());
+	if(ret){
+		downloading = -1;
+		return throwError("Failed to create temporary ZIP file", ret);
+	}
 
-	if(FSUSER_OpenFile(&tmpZip_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), FS_OPEN_WRITE, 0))
-		return throwError("Failed to open temporary ZIP file");
+	ret = FSUSER_OpenFile(&tmpZip_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), FS_OPEN_WRITE, 0);
+	if(ret){
+		downloading = -1;
+		return throwError("Failed to open temporary ZIP file", ret);
+	}
 
-	if(FSFILE_Write(tmpZip_handle, nullptr, 0, &zipData[0], (u64)zipData.size(), FS_WRITE_FLUSH))
-		return throwError("Failed to write to the temporary ZIP file");
+	ret = FSFILE_Write(tmpZip_handle, nullptr, 0, &zipData[0], (u64)zipData.size(), FS_WRITE_FLUSH);
+	if(ret){
+		downloading = -1;
+		return throwError("Failed to write to the temporary ZIP file", ret);
+	}
 
 	FSFILE_Close(tmpZip_handle);
 
 	// verify if the zip is correct
 	unzFile zipFile = unzOpen("/3ds/Themely/tmp.zip");
-	if(!zipFile)
+	if(!zipFile){
+		downloading = -1;
 		return throwError(i18n("err_zip_invalid"));
+	}
 
 	if(unzLocateFile(zipFile, "body_LZ.bin", 0) && unzLocateFile(zipFile, "body_lz.bin", 0)){
 		unzClose(zipFile);
+		downloading = -1;
 		return throwError(i18n("err_zip_no_body"));
 	}
 
@@ -279,13 +290,18 @@ void downloadThemeFromURL(void* url){
 
 	// move file
 	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str()));
-	if(FSUSER_RenameFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str())))
-		return throwError("Failed to move from temporary path to /Themes");
+	ret = FSUSER_RenameFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str()));
+	if(ret){
+		downloading = -1;
+		return throwError("Failed to move from temporary path to /Themes", ret);
+	}
 
 	// scan theme
 	Handle themeDir;
-	if(FSUSER_OpenDirectory(&themeDir, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes/")))
+	if(FSUSER_OpenDirectory(&themeDir, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes/"))){
+		downloading = -1;
 		return throwError("Failed to open /Themes/");
+	}
 
 	FS_DirectoryEntry* foundEntry;
 
@@ -299,6 +315,7 @@ void downloadThemeFromURL(void* url){
 				break;
 			}
 		} else {
+			downloading = -1;
 			throwError("Can't find ZIP in /Themes");
 			break;
 		}

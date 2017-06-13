@@ -8,4 +8,4 @@
 #include "theme.h"
 #include "network.h"
 
-void INPUT_handle();
+int INPUT_handle();

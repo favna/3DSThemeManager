@@ -492,14 +492,16 @@ void installTheme(void* noBGM){
 	u64 saveDataDat_size;
 	Handle saveDataDat_handle;
 
-	if(FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0))
-		return throwError(i18n("err_fail_open", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.date"), FS_OPEN_READ | FS_OPEN_WRITE, 0);
+	if(ret)
+		return throwError(i18n("err_fail_open", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	FSFILE_GetSize(saveDataDat_handle, &saveDataDat_size);
 
 	saveDataDat_buf = new u8[saveDataDat_size];
-	if(FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size))
-		return throwError(i18n("err_fail_read", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size);
+	if(ret)
+		return throwError(i18n("err_fail_read", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "SaveData.dat");
 
@@ -516,8 +518,9 @@ void installTheme(void* noBGM){
 		saveDataDat_buf[0x13bd] = 3; // make it persistent
 		saveDataDat_buf[0x13b8] = 0xff; // theme index
 
-		if(FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH))
-			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
+		ret = FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH);
+		if(ret)
+			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 	}
 
 	free(saveDataDat_buf);
@@ -528,17 +531,20 @@ void installTheme(void* noBGM){
 
 	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0)){
 		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"));
-		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)0x150000))
-			return throwError(L"Failed to create BodyCache.bin." + wstring(L" ") + i18n("err_try_default"));
+		ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), 0, (u64)0x150000);
+		if(ret)
+			return throwError(L"Failed to create BodyCache.bin." + wstring(L" ") + i18n("err_try_default"), ret);
 
-		if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0))
-			return throwError(i18n("err_fail_open", "BodyCache.bin") + wstring(L" ") + i18n("err_try_default"));
+		ret = FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_WRITE, 0);
+		if(ret)
+			return throwError(i18n("err_fail_open", "BodyCache.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 	}
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "BodyCache.bin");
 
-	if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0, &bodyData[0], (u64)bodyData.size(), FS_WRITE_FLUSH))
-		return throwError(i18n("err_fail_write", "BodyCache.bin") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSFILE_Write(bodyCacheBin_handle, nullptr, 0, &bodyData[0], (u64)bodyData.size(), FS_WRITE_FLUSH);
+	if(ret)
+		return throwError(i18n("err_fail_write", "BodyCache.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	FSFILE_Close(bodyCacheBin_handle);
 
@@ -547,11 +553,13 @@ void installTheme(void* noBGM){
 
 	if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0)){
 		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"));
-		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008))
-			return throwError(L"Failed to create BgmCache.bin." + wstring(L" ") + i18n("err_try_default"));
+		ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), 0, (u64)3371008);
+		if(ret)
+			return throwError(L"Failed to create BgmCache.bin." + wstring(L" ") + i18n("err_try_default"), ret);
 
-		if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0))
-			return throwError(i18n("err_fail_open", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"));
+		ret = FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_WRITE, 0);
+		if(ret)
+			return throwError(i18n("err_fail_open", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 	}
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "BgmCache.bin");
@@ -564,7 +572,7 @@ void installTheme(void* noBGM){
 		delete[] empty;
 	}
 	if(ret)
-		return throwError(i18n("err_fail_write", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"));
+		return throwError(i18n("err_fail_write", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	FSFILE_Close(bgmCacheBin_handle);
 
@@ -576,11 +584,13 @@ void installTheme(void* noBGM){
 	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
 	//	return throwError(L"Failed to create ThemeManage.bin." + wstring(L" ") + i18n("err_try_default"));
 
-	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
-		return throwError(i18n("err_fail_open", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0);
+	if(ret)
+		return throwError(i18n("err_fail_open", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
-	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
-		return throwError(i18n("err_fail_read", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800);
+	if(ret)
+		return throwError(i18n("err_fail_read", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "ThemeManage.bin");
 
@@ -624,8 +634,9 @@ void installTheme(void* noBGM){
 	//memset(themeManageBin_buf, 0, 0x800);
 	//memcpy(themeManageBin_buf, thememanage, 0x20);
 
-	if(FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH))
-		return throwError(i18n("err_fail_write", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH);
+	if(ret)
+		return throwError(i18n("err_fail_write", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	FSFILE_Close(themeManageBin_handle);
 
@@ -650,14 +661,16 @@ void installShuffle(void*){
 	u64 saveDataDat_size;
 	Handle saveDataDat_handle;
 
-	if(FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0))
-		return throwError(i18n("err_fail_open", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0);
+	if(ret)
+		return throwError(i18n("err_fail_open", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	FSFILE_GetSize(saveDataDat_handle, &saveDataDat_size);
 
 	saveDataDat_buf = new u8[saveDataDat_size];
-	if(FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size))
-		return throwError(i18n("err_fail_read", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSFILE_Read(saveDataDat_handle, nullptr, 0, saveDataDat_buf, (u32)saveDataDat_size);
+	if(ret)
+		return throwError(i18n("err_fail_read", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "SaveData.dat");
 
@@ -682,8 +695,9 @@ void installShuffle(void*){
 			}
 		}
 
-		if(FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH))
-			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"));
+		ret = FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH);
+		if(ret)
+			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 	}
 
 	delete[] saveDataDat_buf;
@@ -693,11 +707,13 @@ void installShuffle(void*){
 	Handle bodyCacheBin_handle;
 	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), FS_OPEN_WRITE, 0)){
 		FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"));
-		if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), 0, 0x150000*10))
-			return throwError(L"Failed to create BodyCache_rd.bin." + wstring(L" ") + i18n("err_try_default"));
+		ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), 0, 0x150000*10);
+		if(ret)
+			return throwError(L"Failed to create BodyCache_rd.bin." + wstring(L" ") + i18n("err_try_default"), ret);
 
-		if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), FS_OPEN_WRITE, 0))
-			return throwError(i18n("err_fail_open", "BodyCache_rd.bin") + wstring(L" ") + i18n("err_try_default"));
+		ret = FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache_rd.bin"), FS_OPEN_WRITE, 0);
+		if(ret)
+			return throwError(i18n("err_fail_open", "BodyCache_rd.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 	}
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "BodyCache_rd.bin");
@@ -730,8 +746,9 @@ void installShuffle(void*){
 
 			themesToBeShuffled_bodySize.push_back(tmpBodyData.size());
 
-			if(FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, &tmpBodyData[0], tmpBodyData.size(), FS_WRITE_FLUSH))
-				return throwError(i18n("err_fail_write", "BodyCache_rd.bin") + wstring(L" ") + i18n("err_try_default"));
+			ret = FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, &tmpBodyData[0], tmpBodyData.size(), FS_WRITE_FLUSH);
+			if(ret)
+				return throwError(i18n("err_fail_write", "BodyCache_rd.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 		} else {
 			char* empty = new char[0x150000]();
 			FSFILE_Write(bodyCacheBin_handle, nullptr, 0x150000 * i, empty, 0x150000, FS_WRITE_FLUSH);
@@ -748,11 +765,13 @@ void installShuffle(void*){
 		Handle bgmCacheBin_handle;
 		if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), FS_OPEN_WRITE, 0)){
 			FSUSER_DeleteFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()));
-			if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), 0, (u64)3371008))
-				return throwError(L"Failed to create BgmCache_0" + to_wstring(i) + L".bin." + wstring(L" ") + i18n("err_try_default"));
+			ret = FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), 0, (u64)3371008);
+			if(ret)
+				return throwError(L"Failed to create BgmCache_0" + to_wstring(i) + L".bin." + wstring(L" ") + i18n("err_try_default"), ret);
 
-			if(FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), FS_OPEN_WRITE, 0))
-				return throwError(i18n("err_fail_open", "BgmCache_0" + to_string(i) + ".bin") + wstring(L" ") + i18n("err_try_default"));
+			ret = FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, ("/BgmCache_0" + to_string(i) + ".bin").c_str()), FS_OPEN_WRITE, 0);
+			if(ret)
+				return throwError(i18n("err_fail_open", "BgmCache_0" + to_string(i) + ".bin") + wstring(L" ") + i18n("err_try_default"), ret);
 		}
 
 		if(themesToBeShuffled.size() > i && !themes[themesToBeShuffled[i]].shuffleNoBGM){
@@ -795,7 +814,7 @@ void installShuffle(void*){
 		}
 
 		if(ret)
-			return throwError(i18n("err_fail_write", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"));
+			return throwError(i18n("err_fail_write", "BgmCache.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
 		FSFILE_Close(bgmCacheBin_handle);
 	}
@@ -808,11 +827,13 @@ void installShuffle(void*){
 	//if(FSUSER_CreateFile(ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), 0, 0x800))
 	//	return throwError(L"Failed to create ThemeManage.bin." + wstring(L" ") + i18n("err_try_default"));
 
-	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
-		return throwError(i18n("err_fail_open", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0);
+	if(ret)
+		return throwError(i18n("err_fail_open", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
-	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
-		return throwError(i18n("err_fail_read", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800);
+	if(ret)
+		return throwError(i18n("err_fail_read", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "ThemeManage.bin");
 
@@ -844,8 +865,9 @@ void installShuffle(void*){
 		}
 	}
 
-	if(FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH))
-		return throwError(i18n("err_fail_write", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"));
+	ret = FSFILE_Write(themeManageBin_handle, nullptr, 0, themeManageBin_buf, 0x800, FS_WRITE_FLUSH);
+	if(ret)
+		return throwError(i18n("err_fail_write", "ThemeManage.bin") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	FSFILE_Close(themeManageBin_handle);
 
@@ -876,6 +898,8 @@ void deleteTheme(){
 }
 
 void dumpTheme(){
+	Result ret;
+
 	string num;
 	for (size_t i = 0; i < 100; i++){
 		char str[3];
@@ -904,11 +928,13 @@ void dumpTheme(){
 	Handle bgmOutput_handle;
 
 	// get size of body and bgm
-	if(FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0))
-		return throwError(L"Failed to open ThemeManage.bin");
+	ret = FSUSER_OpenFile(&themeManageBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/ThemeManage.bin"), FS_OPEN_WRITE, 0);
+	if(ret)
+		return throwError(L"Failed to open ThemeManage.bin", ret);
 
-	if(FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800))
-		return throwError(L"Failed to read ThemeManage.bin");
+	ret = FSFILE_Read(themeManageBin_handle, nullptr, 0, themeManageBin_buf, (u32)0x800);
+	if(ret)
+		return throwError(L"Failed to read ThemeManage.bin", ret);
 
 	bodyCacheBin_size = (u64)(*((u32*)&themeManageBin_buf[0x08]));
 	bgmCacheBin_size = (u64)(*((u32*)&themeManageBin_buf[0x0C]));
@@ -917,21 +943,26 @@ void dumpTheme(){
 	FSFILE_Close(themeManageBin_handle);
 
 	// get body
-	if(FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_READ, 0))
-		return throwError(L"Failed to open BodyCache.bin. Perhaps you don't have a theme set?");
+	ret = FSUSER_OpenFile(&bodyCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BodyCache.bin"), FS_OPEN_READ, 0);
+	if(ret)
+		return throwError(L"Failed to open BodyCache.bin. Perhaps you don't have a theme set?", ret);
 
 	bodyCacheBin_buf = new u8[bodyCacheBin_size];
-	if(FSFILE_Read(bodyCacheBin_handle, nullptr, 0, bodyCacheBin_buf, (u32)bodyCacheBin_size))
-		return throwError(L"Failed to read BodyCache.bin. Perhaps you don't have a theme set?");
+	ret = FSFILE_Read(bodyCacheBin_handle, nullptr, 0, bodyCacheBin_buf, (u32)bodyCacheBin_size);
+	if(ret)
+		return throwError(L"Failed to read BodyCache.bin. Perhaps you don't have a theme set?", ret);
 
-	if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), 0, (u64)bodyCacheBin_size))
-		return throwError(L"Failed to create body_LZ.bin");
+	ret = FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), 0, (u64)bodyCacheBin_size);
+	if(ret)
+		return throwError(L"Failed to create body_LZ.bin", ret);
 
-	if(FSUSER_OpenFile(&bodyOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), FS_OPEN_WRITE, 0))
-		return throwError(L"Failed to open body_LZ.bin");
+	ret = FSUSER_OpenFile(&bodyOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), FS_OPEN_WRITE, 0);
+	if(ret)
+		return throwError(L"Failed to open body_LZ.bin", ret);
 
-	if(FSFILE_Write(bodyOutput_handle, nullptr, 0, bodyCacheBin_buf, bodyCacheBin_size, FS_WRITE_FLUSH))
-		return throwError(L"Failed to write to body_LZ.bin");
+	ret = FSFILE_Write(bodyOutput_handle, nullptr, 0, bodyCacheBin_buf, bodyCacheBin_size, FS_WRITE_FLUSH);
+	if(ret)
+		return throwError(L"Failed to write to body_LZ.bin", ret);
 
 	delete[] bodyCacheBin_buf;
 

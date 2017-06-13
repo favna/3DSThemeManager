@@ -80,9 +80,12 @@ void AUDIO_load(string path){
 
 	FILE *mus = fopen(path.c_str(), "rb");
 	currentPlayingAudio->status = ov_open(mus, &currentPlayingAudio->vf, NULL, 0);
-	// TODO: make this non fatal
-	if(currentPlayingAudio->status)
+	if(currentPlayingAudio->status){
+		currentPlayingAudio = NULL;
+		audioIsPlaying = false;
+
 		return throwError(i18n("err_bgm_fail") + L" -- " + s2ws(ov_error_to_string(currentPlayingAudio->status)));
+	}
 
 	vorbis_info *vi = ov_info(&currentPlayingAudio->vf, -1);
 

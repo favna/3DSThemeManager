@@ -131,8 +131,10 @@ int main(int argc, char **argv){
 	queueTask(scanThemes, 0);
 
 	// Main loop
-	while(!(hidKeysDown() & KEY_START) && !closing){
-		INPUT_handle();
+	while(!closing){
+		if(INPUT_handle())
+			break;
+
 		UI_update();
 	}
 

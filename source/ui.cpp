@@ -28,6 +28,20 @@ void sftd_draw_wtext_center(sftd_font* font, int x, int y, unsigned int color, u
 	sftd_draw_wtext(font, (sf2d_get_current_screen() == GFX_TOP ? 400 : 320) / 2 - sftd_get_wtext_width(font, size, text) / 2 + x, y, color, size, text);
 }
 
+void sftd_draw_wtext_center_xy(sftd_font* font, int x, int y, unsigned int color, unsigned int size, const wstring text){
+	int lines = (count(text.begin(), text.end(), L'\n') + 1);
+
+	if(lines == 1)
+		sftd_draw_wtext_center(font, x, 120 - size / 2 + y, color, size, text.c_str());
+	else {
+		basic_istringstream<wchar_t> iss(text);
+		wstring line;
+
+		for (int i = 0; getline(iss, line); i++)
+			sftd_draw_wtext_center(font, x, 120 - lines * size / 2 + i * size + y, color, size, line.c_str());
+	}
+}
+
 u32 getLoadingAnim(){
 	loadingAnimTimer += 2;
 
@@ -333,7 +347,7 @@ void UI_start(){
 	res = load_png("romfs:/ui.png", &TEXTURE.ui.tx);
 
 	if(res)
-		throwError(i18n("err_texture"));
+		throwError(i18n("err_texture"), 0, true);
 
 	// font cache thingy to make text render better
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
@@ -354,33 +368,51 @@ void UI_cleanup(){
 }
 
 void UI_update(){
-	if(isError && STATE.debug != GFX_TOP){
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-
-		for (size_t i = 0; i < 240; i++){
-			sf2d_draw_rectangle(0, i, 400, 1, RGBA8(i, 0, 0, 255));
-		}
-
-		sftd_draw_wtext(FONT.normal, 0, 0, 0xFFFFFFFF, 13, i18n("error_message", VERSION).c_str());
-		sftd_draw_wtext(FONT.normal, 0, 224, 0xFFFFFFFF, 13, i18n("press_start").c_str());
-		sftd_draw_wtext(FONT.normal, 0, 16, 0xFFFFFFFF, 13, wrap(error, 70).c_str());
-		sf2d_end_frame();
-		sf2d_swapbuffers();
-		return;
-	}
-
 	timer++;
 	runAnimations();
 
 	if(STATE.debug != GFX_TOP){
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
+
+		if(isError && errorIsFatal){
+			sftd_draw_wtext(FONT.normal, 0, 0, 0xFFFFFFFF, 13, i18n("error_message", VERSION).c_str());
+			sftd_draw_wtext(FONT.normal, 0, 224, 0xFFFFFFFF, 13, i18n("press_start").c_str());
+			sftd_draw_wtext(FONT.normal, 0, 16, 0xFFFFFFFF, 13, wrap(error, 50).c_str());
+			sf2d_end_frame();
+			sf2d_swapbuffers();
+			return;
+		}
+
 		drawScreen(GFX_TOP);
+
+		if(isError){
+			sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 24, 24, 382, 0, 18, 18);
+			sftd_draw_text(FONT.light, 45, 17, 0xFFFFFFFF, 24, "ERROR. :/");
+			sftd_draw_wtext_center_xy(FONT.normal, 0, 0, 0xFFFFFFFF, 13, wrap(error, 50));
+		}
+
 		sf2d_end_frame();
 	}
 
 	if(STATE.debug != GFX_BOTTOM){
 		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
+
+		if(isError && errorIsFatal){
+			sf2d_end_frame();
+			sf2d_swapbuffers();
+			return;
+		}
+
 		drawScreen(GFX_BOTTOM);
+
+		if(isError){
+			sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 110, 100, 669, 270, 100, 40);
+			sf2d_draw_texture_part(TEXTURE.ui.tx, 110 + 85 + 6, 100 + 25 + 6, 400, 0, 15, 15);
+			sftd_draw_text_center(FONT.light, 0, 100 + 5, 0xFFFFFFFF, 24, "OK");
+		}
+
 		sf2d_end_frame();
 	}
 

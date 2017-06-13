@@ -17,9 +17,15 @@ u16* buf;
 sf2d_texture* cameraOutput;
 
 void startQRMode(){
+	Result ret;
+
 	QRMode = true;
 
-	camInit();
+	ret = camInit();
+	if(ret){
+		QRMode = false;
+		return throwError("Failed to initiate camera.", ret);
+	}
 
 	CAMU_SetSize(SELECT_OUT1_OUT2, SIZE_CTR_TOP_LCD, CONTEXT_A);
 	CAMU_SetOutputFormat(SELECT_OUT1_OUT2, OUTPUT_RGB_565, CONTEXT_A);

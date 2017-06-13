@@ -17,16 +17,25 @@ u64 ARCHIVE_HomeExt;
 u64 ARCHIVE_ThemeExt;
 
 bool isError = false;
+bool errorIsFatal = false;
 wstring error = L"";
 
-void throwError(string err){
-	throwError(wstring(err.begin(), err.end()));
+void throwError(string err, Result res, bool fatal){
+	throwError(wstring(err.begin(), err.end()), res, fatal);
 }
 
-void throwError(wstring err){
-	printf("%s:%d:%ls\n", __FILE__, __LINE__, err.c_str());
+void throwError(wstring err, Result res, bool fatal){
+	printf("%s:%d\n", __FILE__, __LINE__);
 	error = err;
+
+	if(res){
+		wstringstream ss;
+		ss << hex << res;
+		error += L"\n\n(0x" + ss.str() + L")";
+	}
+
 	isError = true;
+	errorIsFatal = fatal;
 }
 
 wstring s2ws(const string& str){
@@ -43,12 +52,15 @@ string ws2s(const wstring& wstr){
 	return converterX.to_bytes(wstr);
 }
 
-string wrap(const string text, size_t line_length) {
+string wrap(string text, size_t line_length) {
+	replace(text.begin(), text.end(), '\n', '\xFF');
+
 	istringstream words(text);
 	ostringstream wrapped;
 	string word;
 
 	if(words >> word){
+		printf(word.c_str());
 		wrapped << word;
 		size_t space_left = line_length - word.length();
 		while (words >> word){
@@ -62,10 +74,15 @@ string wrap(const string text, size_t line_length) {
 		}
 	}
 
-	return wrapped.str();
+	string toReturn = wrapped.str();
+	replace(toReturn.begin(), toReturn.end(), '\xFF', '\n');
+
+	return toReturn;
 }
 
-wstring wrap(const wstring text, size_t line_length){
+wstring wrap(wstring text, size_t line_length){
+	replace(text.begin(), text.end(), L'\n', L'\xFF');
+
 	basic_istringstream<wchar_t> words(text);
 	basic_ostringstream<wchar_t> wrapped;
 	wstring word;
@@ -84,7 +101,10 @@ wstring wrap(const wstring text, size_t line_length){
 		}
 	}
 
-	return wrapped.str();
+	wstring toReturn = wrapped.str();
+	replace(toReturn.begin(), toReturn.end(), L'\xFF', L'\n');
+
+	return toReturn;
 }
 
 int numOfDigits(const string str){

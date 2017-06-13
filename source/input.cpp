@@ -23,13 +23,27 @@ bool checkTouch(int ax1, int ay1, int ax2, int ay2){
 	return false;
 }
 
-void INPUT_handle(){
+int INPUT_handle(){
 	hidScanInput();
 
-	if(isError || isInstalling || !themesScanned || downloading > -1)
-		return;
-
 	u32 kDown = hidKeysDown();
+	if(kDown & KEY_START)
+		return -1;
+
+	if(isError){
+		if(!errorIsFatal && kDown & KEY_A){
+			error = L"";
+			isError = false;
+
+			isInstalling = false;
+		}
+
+		return 0;
+	}
+
+	if(isInstalling || !themesScanned || downloading > -1)
+		return 0;
+
 	u32 kHeld = hidKeysHeld();
 	u32 kUp = hidKeysUp();
 	touchPosition touchPos;
@@ -59,7 +73,7 @@ void INPUT_handle(){
 		if(kHeld & KEY_CPAD_UP && updateTextOffset != 0)
 			updateTextOffset = fmin(0, updateTextOffset + circlePos.dy / 10);
 
-		return;
+		return 0;
 	}
 
 	if(deletePrompt){
@@ -68,7 +82,7 @@ void INPUT_handle(){
 		else if(kUp & KEY_B)
 			deletePrompt = false;
 
-		return;
+		return 0;
 	}
 
 	if(dumpPrompt){
@@ -77,7 +91,7 @@ void INPUT_handle(){
 		else if(kUp & KEY_B)
 			dumpPrompt = false;
 
-		return;
+		return 0;
 	}
 
 	if(kUp & KEY_B){
@@ -95,7 +109,7 @@ void INPUT_handle(){
 					toggleBGM();
 
 				if(currentPlayingAudio || audioIsPlaying)
-					return;
+					return 0;
 
 				if(kDown & KEY_X || kHeld & KEY_X)
 					XHeldLength++;
@@ -192,4 +206,6 @@ void INPUT_handle(){
 
 	if(kHeld & KEY_TOUCH)
 		lastTouch = touchPos;
+
+	return 0;
 }
