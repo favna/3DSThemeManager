@@ -492,7 +492,7 @@ void installTheme(void* noBGM){
 	u64 saveDataDat_size;
 	Handle saveDataDat_handle;
 
-	ret = FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.date"), FS_OPEN_READ | FS_OPEN_WRITE, 0);
+	ret = FSUSER_OpenFile(&saveDataDat_handle, ARCHIVE_HomeExt, fsMakePath(PATH_ASCII, "/SaveData.dat"), FS_OPEN_READ | FS_OPEN_WRITE, 0);
 	if(ret)
 		return throwError(i18n("err_fail_open", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 
