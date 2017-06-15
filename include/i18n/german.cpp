@@ -66,5 +66,5 @@ std::map<std::string, std::wstring> GERMAN = {
 	{"err_fail_write",     L"Konnte auf %s nicht schreiben."},
 	{"err_try_default",    L"Versuche erst eines der normalen Themes im HOME-Menü auszuwählen, und probiere es noch einmal"},
 	// err_bgm_too_big
-	{"err_no_dsp",         L"DSP-Dump nicht gefunden! Du brauchst einen Dump deiner DSP-Firm um Audio abzuspielen."}
+	{"err_no_dsp",         L"DSP-Dump nicht gefunden! Du brauchst einen Dump deiner DSP-Firm um Audio abzuspielen. Verwenden Sie DSP1, um DSP zu extrahieren."}
 };

@@ -66,5 +66,5 @@ std::map<std::string, std::wstring> PORTUGUESE = {
 	{"err_fail_write",     L"Falha ao escrever em %s."},
 	{"err_try_default",    L"Tente selecionar um dos temas padrões nas configurações do menu HOME antes de tentar novamente"},
 	// err_bgm_too_big
-	{"err_no_dsp",         L"DSP não encontrado! Use DspDump para extrair o firmware DSP, necessário para a reprodução de áudio."}
+	{"err_no_dsp",         L"DSP não encontrado! Use DSP1 para extrair o firmware DSP, necessário para a reprodução de áudio."}
 };

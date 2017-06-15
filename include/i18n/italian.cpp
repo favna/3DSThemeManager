@@ -66,5 +66,5 @@ std::map<std::string, std::wstring> ITALIAN = {
 	{"err_fail_write",     L"Scrittura fallita di %s."},
 	{"err_try_default",    L"Provare a selezionare uno dei temi predefiniti nelle impostazioni del menu prima di riprovare"},
 	// err_bgm_too_big
-	{"err_no_dsp",         L"DSP dump non trovato! Utilizzare DspDump per scaricare il firmware DSP richiesto per riprodurre l'audio."}
+	{"err_no_dsp",         L"DSP dump non trovato! Utilizzare DSP1 per scaricare il firmware DSP richiesto per riprodurre l'audio."}
 };
