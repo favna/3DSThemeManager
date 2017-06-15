@@ -4,6 +4,7 @@
 #include "global.h"
 
 const bool HOMEBREW = envIsHomebrew();
+bool NEW3DS = false;
 
 volatile bool closing = false;
 

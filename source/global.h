@@ -29,6 +29,7 @@ struct appState {
 };
 
 extern const bool HOMEBREW;
+extern bool NEW3DS;
 
 extern volatile bool closing;
 

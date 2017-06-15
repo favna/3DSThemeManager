@@ -19,8 +19,10 @@ void start(){
 
 	Result ret;
 
-	APT_SetAppCpuTimeLimit(80);
+	APT_SetAppCpuTimeLimit(30);
 	osSetSpeedupEnable(true);
+
+	APT_CheckNew3DS(&NEW3DS);
 
 	// Initiate services
 	romfsInit();

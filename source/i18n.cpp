@@ -14,6 +14,9 @@
 u8 lang = 1;
 
 wstring i18n(const string& token){
+	if((currentPlayingAudio || audioIsPlaying) && !NEW3DS && token != "playing" && token != "stop_bgm")
+		return wstring(L"");
+
 	map<string, wstring> langMap;
 
 	/*

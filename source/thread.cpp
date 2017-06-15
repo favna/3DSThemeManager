@@ -3,7 +3,7 @@
 
 #include "thread.h"
 
-Thread THREADS[2];
+Thread THREADS[4];
 deque<Task> taskQueue;
 LightLock taskQueueLock;
 volatile uint threadsRunning = 0;
@@ -69,7 +69,9 @@ void worker(void* arg){
 void startWorkers(){
 	LightLock_Init(&taskQueueLock);
 
-	for (size_t i = 0; i < 2; i++)
+	int threadCount = NEW3DS ? 4 : 2;
+
+	for (size_t i = 0; i < threadCount; i++)
 		THREADS[i] = createThread(worker, (void*)i);
 }
 

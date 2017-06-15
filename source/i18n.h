@@ -5,6 +5,7 @@
 
 #include "global.h"
 #include "config.h"
+#include "audio.h"
 
 #include <map>
 #include <stdarg.h>
