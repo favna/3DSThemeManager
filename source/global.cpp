@@ -9,7 +9,7 @@ bool NEW3DS = false;
 volatile bool closing = false;
 
 appState STATE = {
-	1, // debug (GFX_TOP, GFX_BOTTOM, -1)
+	-1, // debug (GFX_TOP, GFX_BOTTOM, -1)
 	false // shouldSaveConfig
 };
 
