@@ -968,7 +968,36 @@ void dumpTheme(){
 	FSFILE_Close(bodyCacheBin_handle);
 	FSFILE_Close(bodyOutput_handle);
 
+	Handle themeDir;
+	if(FSUSER_OpenDirectory(&themeDir, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes/"))){
+		downloading = -1;
+		return throwError("Failed to open /Themes/");
+	}
+
+	FS_DirectoryEntry* foundEntry;
+
+	while (true){
+		u32 entriesRead;
+		FS_DirectoryEntry* entry = new FS_DirectoryEntry;
+		FSDIR_Read(themeDir, &entriesRead, 1, entry);
+		if(entriesRead){
+			if(!u16tstr(entry->name, 0x106).compare("Themely_Dump" + num)){
+				foundEntry = entry;
+				break;
+			}
+		} else
+			break;
+	}
+
+	FSDIR_Close(themeDir);
+
+	if(foundEntry){
+		loadTheme((void*)foundEntry);
+		//loadPreview((void*)themes.size() - 1);
+	}
+
 	dumpPrompt = false;
+	selectTheme(themes.size() - 1);
 }
 
 void toggleBGM(){
