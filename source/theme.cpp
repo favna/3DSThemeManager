@@ -505,23 +505,14 @@ void installTheme(void* noBGM){
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "SaveData.dat");
 
-	if(
-		!(
-			saveDataDat_buf[0x141b] == 0 &&
-			saveDataDat_buf[0x13b8] != 0 &&
-			saveDataDat_buf[0x13bc] == 0 &&
-			saveDataDat_buf[0x13bd] == 3
-		)
-	){
-		saveDataDat_buf[0x141b] = 0; // turn off shuffle
-		memset(&saveDataDat_buf[0x13b8], 0, 8); // clear the regular theme structure
-		saveDataDat_buf[0x13bd] = 3; // make it persistent
-		saveDataDat_buf[0x13b8] = 0xff; // theme index
+	saveDataDat_buf[0x141b] = 0; // turn off shuffle
+	memset(&saveDataDat_buf[0x13b8], 0, 8); // clear the regular theme structure
+	saveDataDat_buf[0x13bd] = 3; // make it persistent
+	saveDataDat_buf[0x13b8] = 0xff; // theme index
 
-		ret = FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH);
-		if(ret)
-			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
-	}
+	ret = FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH);
+	if(ret)
+		return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	free(saveDataDat_buf);
 	FSFILE_Close(saveDataDat_handle);
@@ -674,31 +665,22 @@ void installShuffle(void*){
 
 	installProgress += wstring(L"\n") + i18n("install_writing", "SaveData.dat");
 
-	if(
-		!(
-			saveDataDat_buf[0x141b] == 1 &&
-			saveDataDat_buf[0x13b8] != 0 &&
-			saveDataDat_buf[0x13bc] == 0 &&
-			saveDataDat_buf[0x13bd] == 3
-		)
-	){
-		saveDataDat_buf[0x141b] = 1; // turn on shuffle
-		memset(&saveDataDat_buf[0x13b8], 0, 8); // clear the regular theme structure
-		saveDataDat_buf[0x13bd] = 3; // make it persistent
-		saveDataDat_buf[0x13b8] = 0xff; // theme index
+	saveDataDat_buf[0x141b] = 1; // turn on shuffle
+	memset(&saveDataDat_buf[0x13b8], 0, 8); // clear the regular theme structure
+	saveDataDat_buf[0x13bd] = 3; // make it persistent
+	saveDataDat_buf[0x13b8] = 0xff; // theme index
 
-		for (size_t i = 0; i < 10; i++) {
-			memset(&saveDataDat_buf[0x13C0 + 0x8 * i], 0, 8);
-			if(themesToBeShuffled.size() > i){
-				saveDataDat_buf[0x13C0 + 0x8 * i] = i;
-				saveDataDat_buf[0x13C0 + 0x8 * i + 5] = 3;
-			}
+	for (size_t i = 0; i < 10; i++) {
+		memset(&saveDataDat_buf[0x13C0 + 0x8 * i], 0, 8);
+		if(themesToBeShuffled.size() > i){
+			saveDataDat_buf[0x13C0 + 0x8 * i] = i;
+			saveDataDat_buf[0x13C0 + 0x8 * i + 5] = 3;
 		}
-
-		ret = FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH);
-		if(ret)
-			return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 	}
+
+	ret = FSFILE_Write(saveDataDat_handle, nullptr, 0, saveDataDat_buf, saveDataDat_size, FS_WRITE_FLUSH);
+	if(ret)
+		return throwError(i18n("err_fail_write", "SaveData.dat") + wstring(L" ") + i18n("err_try_default"), ret);
 
 	delete[] saveDataDat_buf;
 	FSFILE_Close(saveDataDat_handle);
