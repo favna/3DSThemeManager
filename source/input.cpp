@@ -27,11 +27,18 @@ int INPUT_handle(){
 	hidScanInput();
 
 	u32 kDown = hidKeysDown();
+	u32 kHeld = hidKeysHeld();
+	u32 kUp = hidKeysUp();
+	touchPosition touchPos;
+	hidTouchRead(&touchPos);
+	circlePosition circlePos;
+	hidCircleRead(&circlePos);
+
 	if(kDown & KEY_START)
 		return -1;
 
 	if(isError){
-		if(!errorIsFatal && kDown & KEY_A){
+		if(!errorIsFatal && kUp & KEY_A){
 			error = L"";
 			isError = false;
 
@@ -43,13 +50,6 @@ int INPUT_handle(){
 
 	if(isInstalling || !themesScanned || downloading > -1)
 		return 0;
-
-	u32 kHeld = hidKeysHeld();
-	u32 kUp = hidKeysUp();
-	touchPosition touchPos;
-	hidTouchRead(&touchPos);
-	circlePosition circlePos;
-	hidCircleRead(&circlePos);
 
 	if(kDown & KEY_TOUCH){
 		lastTouch = touchPos;

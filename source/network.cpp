@@ -82,7 +82,16 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 		char* tmpFileName = new char[1024];
 		if(!httpcGetResponseHeader(&context, "Content-Disposition", tmpFileName, 1024)){
 			string tmpFileNameStr = string(tmpFileName);
-			*fileName = tmpFileNameStr.substr(tmpFileNameStr.find("\""), tmpFileNameStr.find_last_of("\"") - tmpFileNameStr.find("\"")).substr(1);
+			tmpFileNameStr = tmpFileNameStr.substr(tmpFileNameStr.find("\""), tmpFileNameStr.find_last_of("\"") - tmpFileNameStr.find("\"")).substr(1);
+
+			string illegalChars = "\\/:?\"<>|*^";
+			for (string::iterator it = tmpFileNameStr.begin(); it < tmpFileNameStr.end(); it++){
+				bool found = illegalChars.find(*it) != string::npos;
+				if(found)
+					*it = '-';
+			}
+
+			*fileName = tmpFileNameStr;
 		}
 
 		delete[] tmpFileName;
@@ -248,6 +257,13 @@ void downloadThemeFromURL(void* url){
 		downloading = -1;
 		return throwError("Filename must not exceed 262 characters");
 	}
+
+	if(!hasSuffix(fileName, ".zip")){
+		downloading = -1;
+		return throwError("Filename doesn't end with .zip");
+	}
+
+	printf("%s\n", fileName.c_str());
 
 	// store it temporarily
 	Handle tmpZip_handle;

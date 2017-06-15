@@ -9,7 +9,7 @@ bool NEW3DS = false;
 volatile bool closing = false;
 
 appState STATE = {
-	-1, // debug (GFX_TOP, GFX_BOTTOM, -1)
+	1, // debug (GFX_TOP, GFX_BOTTOM, -1)
 	false // shouldSaveConfig
 };
 
@@ -61,7 +61,6 @@ string wrap(string text, size_t line_length) {
 	string word;
 
 	if(words >> word){
-		printf(word.c_str());
 		wrapped << word;
 		size_t space_left = line_length - word.length();
 		while (words >> word){
@@ -115,6 +114,10 @@ int numOfDigits(const string str){
 			num++;
 
 	return num;
+}
+
+bool hasSuffix(const string& str, const string& suffix){
+	return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 bool fileExists(u16string name){

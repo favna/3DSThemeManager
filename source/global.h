@@ -51,6 +51,7 @@ string ws2s(const wstring&);
 string wrap(string, size_t);
 wstring wrap(wstring, size_t);
 int numOfDigits(const string);
+bool hasSuffix(const string&, const string&);
 
 bool fileExists(u16string);
 string u16tstr(u16*, size_t);
