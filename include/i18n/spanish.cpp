@@ -65,5 +65,6 @@ std::map<std::string, std::wstring> SPANISH = {
 	{"err_fail_read",      L"Fallo al leer %s."},
 	{"err_fail_write",     L"Fallo al escribir en %s."},
 	{"err_try_default",    L"Intenta selecionar uno de los temas por defecto en los ajustes del menú home antes de intentarlo de nuevo"},
+	// err_bgm_too_big
 	{"err_no_dsp",         L"¡DSP no encontrado! Usa DspDump para hacer un volcado del firmware DSP requerido para la reprodución de audio."}
 };

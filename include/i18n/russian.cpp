@@ -65,5 +65,6 @@ std::map<std::string, std::wstring> RUSSIAN = {
 	{"err_fail_read",      L"Ошибка чтения %s."},
 	{"err_fail_write",     L"Ошибка записи в %s."},
 	{"err_try_default",    L"Попробуйте установить одну из стандартных тем в Home Menu, и попытайтесь еще раз."},
+	// err_bgm_too_big
 	{"err_no_dsp",         L"DSP файл не найден! Используйте DspDump чтобы сделать дамп DSP файла необходимого для проигрывания музыки."}
 };

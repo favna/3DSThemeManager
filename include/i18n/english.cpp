@@ -63,5 +63,6 @@ std::map<std::string, std::wstring> ENGLISH = {
 	{"err_fail_read",      L"Failed to read %s."},
 	{"err_fail_write",     L"Failed to write to %s."},
 	{"err_try_default",    L"Try selecting one of the default themes on the home menu settings before trying again"},
+	{"err_bgm_too_big",    L"The BGM file exceeds 3371008 bytes. BGM files bigger than this size can softbrick your device."},
 	{"err_no_dsp",         L"DSP dump not found! Use DspDump to dump the DSP firmware required to playback audio."}
 };

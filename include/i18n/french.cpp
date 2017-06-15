@@ -63,5 +63,6 @@ std::map<std::string, std::wstring> FRENCH = {
 	{"err_fail_read",      L"Échec de lecture de %s."},
 	{"err_fail_write",     L"Échec d'écriture à %s."},
 	{"err_try_default",    L"Essayez de sélectionner l'un des thèmes par défaut dans les paramètres du menu HOME, puis réessayez"},
+	{"err_bgm_too_big",    L"Le fichier musique dépasse 3371008 octets. Les fichiers dépassant ce limite peuvent soft-briquer votre 3DS."},
 	{"err_no_dsp",         L"Le dump DSP n'a pas été trouvé ! Utilisez DspDump pour extraire le firmware DSP requis pour l'aperçu audio."}
 };
