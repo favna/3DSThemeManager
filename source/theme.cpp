@@ -134,6 +134,7 @@ void loadTheme(void* entryVP){
 		if(!zipFile){
 			printf("INVALID ZIP:%s\n", u16tstr(entry->name, 0x106).c_str());
 			delete entry;
+			themesScanned = true;
 			return;
 		}
 
@@ -141,6 +142,7 @@ void loadTheme(void* entryVP){
 			unzClose(zipFile);
 			printf("NO BODY:%s\n", u16tstr(entry->name, 0x106).c_str());
 			delete entry;
+			themesScanned = true;
 			return;
 		}
 
