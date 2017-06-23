@@ -8,11 +8,11 @@ git clone https://github.com/xerpi/sftdlib.git;
 git clone https://github.com/xerpi/sfillib.git;
 
 cd 3ds_portlibs;
-make zlib;
-make install-zlib;
-make libogg;
-make install;
-make libjpeg-turbo libpng freetype tremor;
+make zlib -j4;
+sudo -E make install-zlib;
+make libogg -j4;
+sudo -E make install;
+make libjpeg-turbo libpng freetype tremor -j4;
 sudo -E make install;
 cd ..;
 
