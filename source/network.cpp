@@ -75,7 +75,7 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 	buf = (u8*)malloc(0x1000);
 	if(buf == NULL){
 		httpcCloseContext(&context);
-		return -1;
+		return -2;
 	}
 
 	if(fileName){
@@ -167,7 +167,7 @@ void checkForUpdate(void*){
 		update += releases[0]["tag_name"];
 		update += ":\n";
 		update += releases[0]["body"];
-		update = update.substr(0, update.find("GBATemp thread:"));
+		update = update.substr(0, update.find("Issue/Suggestion tracker:"));
 		if(bleeding)
 			update += "\n\n";
 
@@ -194,7 +194,7 @@ void checkForUpdate(void*){
 			update += releases[i]["tag_name"];
 			update += ":\n";
 			update += releases[i]["body"];
-			update = update.substr(0, update.find("GBATemp thread:"));
+			update = update.substr(0, update.find("Issue/Suggestion tracker:"));
 			if(bleeding)
 				update += "\n\n";
 		}
