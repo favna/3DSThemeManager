@@ -2,31 +2,20 @@ os: linux
 dist: trusty
 sudo: required
 before_install:
+- 'if [ "$TRAVIS_PULL_REQUEST" = "true" ]; then return 1; fi'
+- mkdir /home/travis/devkitPro
+- cd /home/travis/devkitPro
+- wget "https://3dsthem.es/app/devkitpro.tar.bz2"
+- tar xf devkitpro.tar.bz2
 - export DEVKITPRO=/home/travis/devkitPro
 - export DEVKITARM=${DEVKITPRO}/devkitARM
 - export PATH=$PATH:${DEVKITARM}/bin
-- curl -L https://raw.githubusercontent.com/devkitPro/installer/master/perl/devkitARMupdate.pl
-  -o devkitARMupdate.pl
-- chmod +x ./devkitARMupdate.pl
 - chmod +x $TRAVIS_BUILD_DIR/buildtools/3ds/*
 install:
-- "./devkitARMupdate.pl /home/travis/devkitPro"
-- git clone https://github.com/smealum/ctrulib
-- git clone https://github.com/fincs/citro3d
-- cd ctrulib/libctru
-- make -j4
-- sudo -E make install
-- cd ../..
-- cd citro3d
-- git checkout next
-- make -j4
-- sudo -E make install
 - cd $TRAVIS_BUILD_DIR
 - wget --no-check-certificate https://raw.githubusercontent.com/libretro/RetroArch/master/ctr/tools/bannertool-linux
 - chmod +x bannertool-linux
 - sudo mv bannertool-linux buildtools/3ds/bannertool-linux64
-- sudo chmod +x ./deps.sh
-- "./deps.sh"
 - cd
 script:
 - cd $TRAVIS_BUILD_DIR
