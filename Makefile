@@ -32,12 +32,12 @@ BUILD_FLAGS := -DVERSION='"1.3.0"'
 RUN_FLAGS :=
 
 DEBUG ?= 1
-ifeq (DEBUG, 1)
+ifeq ($(DEBUG), 1)
     LIBRARIES += citro3dd ctrud
-	BUILD_FLAGS += -Og
+    BUILD_FLAGS += -Og
 else
     LIBRARIES += citro3d ctru
-	BUILD_FLAGS += -O4
+    BUILD_FLAGS += -O4
 endif
 
 # 3DS/Wii U CONFIGURATION #
