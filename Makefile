@@ -26,10 +26,19 @@ SOURCE_DIRS := source
 EXTRA_OUTPUT_FILES :=
 
 LIBRARY_DIRS := $(DEVKITPRO)/libctru $(PORTLIBS)
-LIBRARIES := vorbisidec ogg sfil sftd sf2d freetype png citro3dd ctrud z
+LIBRARIES := vorbisidec ogg sfil sftd sf2d freetype png z
 
-BUILD_FLAGS := -DVERSION='"1.3.0"' -Og
+BUILD_FLAGS := -DVERSION='"1.3.0"'
 RUN_FLAGS :=
+
+DEBUG ?= 1
+ifeq (DEBUG, 1)
+    LIBRARIES += citro3dd ctrud
+	BUILD_FLAGS += -Og
+else
+    LIBRARIES += citro3d ctru
+	BUILD_FLAGS += -O4
+endif
 
 # 3DS/Wii U CONFIGURATION #
 
