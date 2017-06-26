@@ -1,8 +1,8 @@
-<div align="center"><img src="https://github.com/ErmanSayin/Themely/raw/master/meta/banner_3ds.png" alt="Themely"/><br/>
+<h3 align="center"><img src="https://github.com/ErmanSayin/Themely/raw/master/meta/banner_3ds.png" alt="Themely"/><br/>
 <img src="https://3dsthem.es/app/screenshot.png" alt="Themely screenshot"/><br/>
-**Themely** is a custom home menu manager for the Nintendo 3DS.<br/><br/>
+<b>Themely</b> is a custom home menu manager for the Nintendo 3DS.<br/><br/>
 <a href="https://github.com/ErmanSayin/Themely/releases/latest">Download</a><br/>
-<a href="https://3dsthem.es/app">Bleeding edge builds</a></div>
+<a href="https://3dsthem.es/app">Bleeding edge builds</a></h3>
 
 # Features
 - **Native code, which allows us to have...**
@@ -11,17 +11,17 @@
 - BGM preview support (CHMM is usually hit or miss with this one)
 - Instant theme preview
 - Fullscreen preview
-- QR Code reader*****
+- QR Code reader<b>&#x002A;</b>
 - Install without BGM
 - Theme shuffle
 - Theme dumping
-- Multilingual (French, German, Italian, Portuguese, Russian, and Spanish available)*****
+- Multilingual (French, German, Italian, Portuguese, Russian, and Spanish available)<b>&#x002A;</b>
 - Self updater
 
-(***** = new in the latest stable release)
+(<b>&#x002A;</b> = new in the latest stable release)
 
 <h3 align="center">
-[Planned features](https://github.com/ErmanSayin/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement) - [Known bugs](https://github.com/ErmanSayin/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+<a href="https://github.com/ErmanSayin/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement">Planned features</a> - <a href="https://github.com/ErmanSayin/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Abug">Known bugs</a>
 </h3>
 
 # Dependencies & Building
