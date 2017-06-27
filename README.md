@@ -31,7 +31,7 @@
 - Latest version of sf2dlib
 - Latest version of sftdlib
 - Latest version of sfillib
-- zlib, libpng, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/ErmanSayin/3ds_portlibs/ recommended)
+- zlib, libpng, libjpeg-turbo, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/ErmanSayin/3ds_portlibs/ recommended)
 
 You can run the `deps.sh` script to install `sf2dlib`, `sftdlib`, `sfillib`, and `3ds-portlibs` automatically.
 
