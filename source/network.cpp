@@ -82,16 +82,21 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 		char* tmpFileName = new char[1024];
 		if(!httpcGetResponseHeader(&context, "Content-Disposition", tmpFileName, 1024)){
 			string tmpFileNameStr = string(tmpFileName);
-			tmpFileNameStr = tmpFileNameStr.substr(tmpFileNameStr.find("\""), tmpFileNameStr.find_last_of("\"") - tmpFileNameStr.find("\"")).substr(1);
+			regex filenameRegex("filename[^;=\\n]*=((['\"]).*?\\2|[^;\\n]*)");
+			smatch regexMatch;
 
-			string illegalChars = "\\/:?\"<>|*^";
-			for (string::iterator it = tmpFileNameStr.begin(); it < tmpFileNameStr.end(); it++){
-				bool found = illegalChars.find(*it) != string::npos;
-				if(found)
-					*it = '-';
+			if(regex_search(tmpFileNameStr, regexMatch, filenameRegex)){
+				if(regexMatch.size() >= 2){
+					tmpFileNameStr = regexMatch[1].str();
+
+					string illegalChars = "\\/:?\"<>|*^";
+					for (size_t i = 0; i < illegalChars.size(); i++)
+						tmpFileNameStr.erase(remove(tmpFileNameStr.begin(), tmpFileNameStr.end(), illegalChars[i]), tmpFileNameStr.end());
+
+					if(tmpFileNameStr.size() > 0)
+						*fileName = tmpFileNameStr;
+				}
 			}
-
-			*fileName = tmpFileNameStr;
 		}
 
 		delete[] tmpFileName;

@@ -15,6 +15,7 @@
 #include <deque>
 #include <locale>
 #include <codecvt>
+#include <regex>
 
 #include <3ds.h>
 #include <sf2d.h>
