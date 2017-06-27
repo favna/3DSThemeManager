@@ -14,7 +14,7 @@ std::map<std::string, std::wstring> GERMAN = {
 	{"themes",              L"%i Themes%ls"},
 	{"plural_suffix",       L""},
 	{"qr_scanner",          L"QR-Code-Scanner"},
-	{"by",                  L"von %s"},
+	{"by",                  L"von %ls"},
 	{"add_to_shuffle",      L"Zu Shuffle hinzufügen"},
 	{"remove_from_shuffle", L"Von Shuffle entfernen"},
 	{"install",             L"Installieren"},

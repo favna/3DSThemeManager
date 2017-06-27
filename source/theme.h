@@ -8,9 +8,9 @@
 
 struct Theme {
 	string fileName;
-	string title;
-	string description;
-	string author;
+	wstring title;
+	wstring description;
+	wstring author;
 
 	sf2d_texture* icon;
 	sf2d_texture* preview;

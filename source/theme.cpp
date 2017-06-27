@@ -20,9 +20,9 @@ void loadTheme(void* entryVP){
 		if(fileExists(u"/Themes/" + u16string((char16_t*)entry->name) + u"/body_LZ.bin")){
 			Theme theme = {
 				u16tstr(entry->name, 0x106),
-				u16tstr(entry->name, 0x106),
-				"no desc",
-				ws2s(i18n("unknown")),
+				s2ws(u16tstr(entry->name, 0x106)),
+				L"no desc",
+				i18n("unknown"),
 				NULL,
 				NULL,
 				false,
@@ -52,49 +52,18 @@ void loadTheme(void* entryVP){
 				char* buffer = new char[0x520];
 				smdhFile.read(buffer, 0x520);
 
-				int offset = 0x8;
+				string tmpTitle = u16tstr((u16*)&buffer[0x8], 64);
+				string tmpDescription = u16tstr((u16*)&buffer[0x8 + 128], 128);
+				string tmpAuthor = u16tstr((u16*)&buffer[0x8 + 128 + 256], 64);
 
-				string tmpTitle = "";
-				string tmpDescription = "";
-				string tmpAuthor = "";
-
-				for (size_t i = 0; i < 128; i++){
-					if(buffer[offset + i] == '\00')
-						break;
-
-					tmpTitle += buffer[offset + i];
-					offset++;
-				}
-
-				offset = 0x8 + 128;
-
-				for (size_t i = 0; i < 256; i++){
-					if(buffer[offset + i] == '\00')
-						break;
-
-					tmpDescription += buffer[offset + i];
-					offset++;
-				}
-
-				offset = 0x8 + 128 + 256;
-
-				for (size_t i = 0; i < 128; i++){
-					if(buffer[offset + i] == '\00')
-						break;
-
-					tmpAuthor += buffer[offset + i];
-					offset++;
-				}
-
-				//if(tmpTitle.find_first_not_of('\00') != string::npos)
 				if(tmpTitle.size() != 0)
-					theme.title = tmpTitle;
+					theme.title = s2ws(tmpTitle);
 
 				if(tmpDescription.size() != 0)
-					theme.description = tmpDescription;
+					theme.description = s2ws(tmpDescription);
 
 				if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
-					theme.author = tmpAuthor;
+					theme.author = s2ws(tmpAuthor);
 
 				smdhFile.seekg(0x24C0);
 				char* iconBuf = new char[0x1200];
@@ -148,9 +117,9 @@ void loadTheme(void* entryVP){
 
 		Theme theme = {
 			u16tstr(entry->name, 0x106),
-			u16tstr(entry->name, 0x106),
-			"no desc",
-			ws2s(i18n("unknown")),
+			s2ws(u16tstr(entry->name, 0x106)),
+			L"no desc",
+			i18n("unknown"),
 			NULL,
 			NULL,
 			true,
@@ -190,48 +159,18 @@ void loadTheme(void* entryVP){
 					unzCloseCurrentFile(zipFile);
 				} else {
 					if(smdhData.size() == 0x36C0){
-						int offset = 0x8;
-
-						string tmpTitle = "";
-						string tmpDescription = "";
-						string tmpAuthor = "";
-
-						for (size_t i = 0; i < 128; i++){
-							if(smdhData[offset + i] == '\00')
-								break;
-
-							tmpTitle += smdhData[offset + i];
-							offset++;
-						}
-
-						offset = 0x8 + 128;
-
-						for (size_t i = 0; i < 256; i++){
-							if(smdhData[offset + i] == '\00')
-								break;
-
-							tmpDescription += smdhData[offset + i];
-							offset++;
-						}
-
-						offset = 0x8 + 128 + 256;
-
-						for (size_t i = 0; i < 128; i++){
-							if(smdhData[offset + i] == '\00')
-								break;
-
-							tmpAuthor += smdhData[offset + i];
-							offset++;
-						}
+						string tmpTitle = u16tstr((u16*)&smdhData[0x8], 64);
+						string tmpDescription = u16tstr((u16*)&smdhData[0x8 + 128], 128);
+						string tmpAuthor = u16tstr((u16*)&smdhData[0x8 + 128 + 256], 64);
 
 						if(tmpTitle.size() != 0)
-							theme.title = tmpTitle;
+							theme.title = s2ws(tmpTitle);
 
 						if(tmpDescription.size() != 0)
-							theme.description = tmpDescription;
+							theme.description = s2ws(tmpDescription);
 
 						if(tmpAuthor.size() != 0 && tmpAuthor.size() < 20)
-							theme.author = tmpAuthor;
+							theme.author = s2ws(tmpAuthor);
 
 						// detects default icons
 						if(smdhData[0x24C0] != '\x9D' && smdhData[0x24C1] != '\x04' && smdhData[0x24C0] != '\xBF' && smdhData[0x24C1] != '\x0D'){

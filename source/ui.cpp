@@ -105,21 +105,21 @@ void drawMain(gfxScreen_t screen){
 		if(!QRMode){
 			if(themes.size() != 0){
 				// title
-				sftd_draw_text(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
+				sftd_draw_wtext(FONT.light, 178, 38, 0xFFFFFFFF, 24, themes[currentSelectedItem].title.c_str());
 
 				// description
-				string desc = "";
-				if(themes[currentSelectedItem].description != "no desc"){
-					istringstream iss(wrap(themes[currentSelectedItem].description, 30));
+				wstring desc = L"";
+				if(themes[currentSelectedItem].description != L"no desc"){
+					basic_istringstream<wchar_t> iss(wrap(themes[currentSelectedItem].description, 40));
 					for (size_t i = 0; i < 6; i++){
-						string line;
+						wstring line;
 
 						if(!getline(iss, line))
 							break;
 
-						desc += (i ? "\n" : "") + line;
+						desc += (i ? L"\n" : L"") + line;
 					}
-					sftd_draw_text(FONT.normal, 178, 70, 0xFFFFFFFF, 13, desc.c_str());
+					sftd_draw_wtext(FONT.normal, 178, 70, 0xFFFFFFFF, 13, desc.c_str());
 				} else
 					sftd_draw_wtext(FONT.normal, 178, 70, 0xFFFFFFFF, 13, i18n("no_desc").c_str());
 
@@ -232,7 +232,7 @@ void drawMain(gfxScreen_t screen){
 					} else
 						sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 48 * i + 30 - themeListOffset, 320, 270, 48, 48);
 
-					sftd_draw_text(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].title.c_str());
+					sftd_draw_wtext(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].title.c_str());
 				}
 			} else {
 				sftd_draw_wtext_center(FONT.light, 0, 240 / 2 - 12, 0xFFFFFFFF, 24, i18n("press_start").c_str());

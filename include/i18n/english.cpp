@@ -12,7 +12,7 @@ std::map<std::string, std::wstring> ENGLISH = {
 	{"themes",              L"%i theme%ls"}, // %ls is the plural suffix
 	{"plural_suffix",       L"s"},
 	{"qr_scanner",          L"QR Code scanner"},
-	{"by",                  L"by %s"},
+	{"by",                  L"by %ls"},
 	{"add_to_shuffle",      L"Add to shuffle"},
 	{"remove_from_shuffle", L"Remove from shuffle"},
 	{"install",             L"Install"},

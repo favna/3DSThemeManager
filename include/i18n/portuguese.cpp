@@ -14,7 +14,7 @@ std::map<std::string, std::wstring> PORTUGUESE = {
 	{"themes",              L"%i tema%ls"}, // %ls is the plural suffix
 	{"plural_suffix",       L"s"},
 	{"qr_scanner",          L"Escanear código QR"},
-	{"by",                  L"por %s"},
+	{"by",                  L"por %ls"},
 	{"add_to_shuffle",      L"Adicionar aos aleatórios"},
 	{"remove_from_shuffle", L"Remover dos aleatórios"},
 	{"install",             L"Instalar"},

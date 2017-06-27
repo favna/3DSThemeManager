@@ -12,7 +12,7 @@ std::map<std::string, std::wstring> FRENCH = {
 	{"themes",              L"%i thème%ls"}, // %ls is the plural suffix
 	{"plural_suffix",       L"s"},
 	{"qr_scanner",          L"Scanner de code QR"},
-	{"by",                  L"par %s"},
+	{"by",                  L"par %ls"},
 	{"add_to_shuffle",      L"Ajouter aux thèmes aléatoires"},
 	{"remove_from_shuffle", L"Retirer des thèmes aléatoires"},
 	{"install",             L"Installer"},
