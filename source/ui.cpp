@@ -181,10 +181,10 @@ void drawMain(gfxScreen_t screen){
 
 				if(isInstalling){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_wtext_center(FONT.huge, 0, 240/2 - 48/2, 0xFFFFFFFF, 48, i18n("installing").c_str());
+					sftd_draw_wtext_center_xy(FONT.huge, 0, 0, 0xFFFFFFFF, 48, i18n("installing").c_str());
 				} else if(downloading > -1){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
-					sftd_draw_wtext_center(FONT.huge, 0, 240/2 - 48/2, 0xFFFFFFFF, 48, i18n("downloading").c_str());
+					sftd_draw_wtext_center_xy(FONT.huge, 0, 0, 0xFFFFFFFF, 48, i18n("downloading").c_str());
 					sf2d_draw_rectangle(0, 215, downloading * 4, 25, 0xFFBC47AB);
 					sftd_draw_text_center(FONT.normal, 0, 219, 0xFFFFFFFF, 13, (to_string(downloading) + "%").c_str());
 				} else if(update.size() != 0){
@@ -217,12 +217,8 @@ void drawMain(gfxScreen_t screen){
 					if(i == currentSelectedItem)
 						sf2d_draw_rectangle(0, 48 * i + 30 - themeListOffset, 320, 48, 0x19FFFFFF);
 
-					if(themes[i].toShuffle){
+					if(themes[i].toShuffle)
 						sf2d_draw_rectangle(0, 48 * i + 30 - themeListOffset, 320, 48, 0x4BBC47AB);
-
-						if(themes[i].shuffleNoBGM)
-							sf2d_draw_texture_part(TEXTURE.ui.tx, 320 - 3 - 40, 48 * i + 30 - themeListOffset + 48 - 15 - 3, 400, 15, 40, 15);
-					}
 
 					if(themes[i].icon){
 						sf2d_draw_texture_scale(themes[i].icon, 0, 48 * i + 48 + 30 - themeListOffset, 1.0f, -1.0f);
@@ -233,9 +229,12 @@ void drawMain(gfxScreen_t screen){
 						sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 48 * i + 30 - themeListOffset, 320, 270, 48, 48);
 
 					sftd_draw_wtext(FONT.light, 56, 48 * i + 8 + 30 - themeListOffset, 0xFFFFFFFF, 24, themes[i].title.c_str());
+
+					if(themes[i].shuffleNoBGM)
+						sf2d_draw_texture_part(TEXTURE.ui.tx, 320 - 3 - 40, 48 * i + 30 - themeListOffset + 48 - 15 - 3, 400, 15, 40, 15);
 				}
 			} else {
-				sftd_draw_wtext_center(FONT.light, 0, 240 / 2 - 12, 0xFFFFFFFF, 24, i18n("press_start").c_str());
+				sftd_draw_wtext_center_xy(FONT.light, 0, 0, 0xFFFFFFFF, 24, i18n("press_start").c_str());
 			}
 		}
 
