@@ -152,7 +152,7 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 void checkForUpdate(void*){
 	vector<char> httpData;
 	bool bleeding = string(VERSION).substr(string(VERSION).find("-") + 1) == "git";
-	Result ret = HTTPGet(httpData, string("https://api.github.com/repos/ErmanSayin/Themely") + (bleeding ? "-bleeding" : "") + "/releases");
+	Result ret = HTTPGet(httpData, string("https://api.github.com/repos/ihaveamac/Themely") + (bleeding ? "-bleeding" : "") + "/releases");
 	if(ret){
 		printf("Failed to check for an update.\n");
 		return;
