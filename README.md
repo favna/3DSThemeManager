@@ -1,8 +1,7 @@
-<h3 align="center"><img src="https://github.com/ErmanSayin/Themely/raw/master/meta/banner_3ds.png" alt="Themely"/><br/>
-<img src="https://3dsthem.es/app/screenshot.png" alt="Themely screenshot"/><br/>
+<h3 align="center"><img src="https://github.com/ihaveamac/Themely/raw/master/meta/banner_3ds.png" alt="Themely"/><br/>
+<img src="https://github.com/ihaveamac/Themely/raw/master/screenshot.png" alt="Themely screenshot"/><br/>
 <b>Themely</b> is a custom home menu manager for the Nintendo 3DS.<br/><br/>
-<a href="https://github.com/ErmanSayin/Themely/releases/latest">Download</a><br/>
-<a href="https://3dsthem.es/app">Bleeding edge builds</a></h3>
+<a href="https://github.com/ihaveamac/Themely/releases/latest">Download</a><br/>
 
 # Features
 - **Native code, which allows us to have...**
@@ -21,7 +20,7 @@
 (<b>&#x002A;</b> = new in the latest stable release)
 
 <h3 align="center">
-<a href="https://github.com/ErmanSayin/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement">Planned features</a> - <a href="https://github.com/ErmanSayin/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Abug">Known bugs</a>
+<a href="https://github.com/ihaveamac/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement">Planned features</a> - <a href="https://github.com/ihaveamac/Themely/issues?q=is%3Aissue+is%3Aopen+label%3Abug">Known bugs</a>
 </h3>
 
 # Dependencies & Building
@@ -31,7 +30,7 @@
 - Latest version of sf2dlib
 - Latest version of sftdlib
 - Latest version of sfillib
-- zlib, libpng, libjpeg-turbo, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/ErmanSayin/3ds_portlibs/ recommended)
+- zlib, libpng, libjpeg-turbo, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/javimadgit/3ds_portlibs/ recommended)
 
 You can run the `deps.sh` script to install `sf2dlib`, `sftdlib`, `sfillib`, and `3ds-portlibs` automatically.
 
