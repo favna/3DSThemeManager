@@ -52,3 +52,5 @@ servefiles.py
 *.elf
 *.3ds
 *.cia
+
+.vscode/
