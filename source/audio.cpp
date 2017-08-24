@@ -1,6 +1,3 @@
-// Themely - home menu manager
-// Copyright (c) 2017 Erman SAYIN
-
 #include "audio.h"
 #include <tremor/ivorbiscodec.h>
 #include <tremor/ivorbisfile.h>

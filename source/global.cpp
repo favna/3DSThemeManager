@@ -1,6 +1,3 @@
-// Themely - home menu manager
-// Copyright (c) 2017 Erman SAYIN
-
 #include "global.h"
 
 const bool HOMEBREW = envIsHomebrew();

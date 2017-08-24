@@ -1,6 +1,3 @@
-// Themely - home menu manager
-// Copyright (c) 2017 Erman SAYIN
-
 #pragma once
 
 #include "global.h"

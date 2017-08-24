@@ -1,6 +1,3 @@
-// Themely - home menu manager
-// Copyright (c) 2017 Erman SAYIN
-
 #include "i18n.h"
 
 #include "i18n/english.cpp"
