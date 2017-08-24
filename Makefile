@@ -16,7 +16,7 @@ PORTLIBS	:=	$(PORTLIBS_PATH)/armv6k $(PORTLIBS_PATH)/3ds
 
 # COMMON CONFIGURATION #
 
-NAME := Themely
+NAME := ThemeManager
 
 BUILD_DIR := build
 OUTPUT_DIR := output
@@ -28,7 +28,7 @@ EXTRA_OUTPUT_FILES :=
 LIBRARY_DIRS := $(DEVKITPRO)/libctru $(PORTLIBS)
 LIBRARIES := vorbisidec ogg sfil sftd sf2d freetype png z
 
-BUILD_FLAGS := -DVERSION='"1.3.1-i0"'
+BUILD_FLAGS := -DVERSION='"4.2.0"'
 RUN_FLAGS :=
 
 DEBUG ?= 1
@@ -43,9 +43,9 @@ endif
 # 3DS/Wii U CONFIGURATION #
 
 ifeq ($(TARGET),$(filter $(TARGET),3DS WIIU))
-    TITLE := Themely
-    DESCRIPTION := A beautiful theme manager
-    AUTHOR := erman1337
+    TITLE := ThemeManager
+    DESCRIPTION := A more beautiful theme manager
+    AUTHOR := Favna
 endif
 
 # 3DS CONFIGURATION #
@@ -54,8 +54,8 @@ ifeq ($(TARGET),3DS)
     LIBRARY_DIRS += $(DEVKITPRO)/libctru
     LIBRARIES += ctru
 
-    PRODUCT_CODE := CTR-P-TMLY
-    UNIQUE_ID := 0x374E5
+    PRODUCT_CODE := CTR-P-TMMN
+    UNIQUE_ID := 0x20A6E
 
     CATEGORY := Application
     USE_ON_SD := true
@@ -72,7 +72,7 @@ ifeq ($(TARGET),3DS)
     BANNER_AUDIO := meta/audio_3ds.wav
     BANNER_IMAGE := meta/banner_3ds.png
     ICON := meta/icon_3ds.png
-    LOGO := meta/logo_3ds.lz11
+    LOGO := 
 endif
 
 # INTERNAL #
