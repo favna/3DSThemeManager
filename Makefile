@@ -16,7 +16,7 @@ PORTLIBS	:=	$(PORTLIBS_PATH)/armv6k $(PORTLIBS_PATH)/3ds
 
 # COMMON CONFIGURATION #
 
-NAME := ThemeManager
+NAME := 3DSThemeManager
 
 BUILD_DIR := build
 OUTPUT_DIR := output
@@ -43,7 +43,7 @@ endif
 # 3DS/Wii U CONFIGURATION #
 
 ifeq ($(TARGET),$(filter $(TARGET),3DS WIIU))
-    TITLE := ThemeManager
+    TITLE := 3DSThemeManager
     DESCRIPTION := A more beautiful theme manager
     AUTHOR := Favna
 endif
@@ -54,7 +54,7 @@ ifeq ($(TARGET),3DS)
     LIBRARY_DIRS += $(DEVKITPRO)/libctru
     LIBRARIES += ctru
 
-    PRODUCT_CODE := CTR-P-TMMN
+    PRODUCT_CODE := CIA-Z-TMMN
     UNIQUE_ID := 0x20A6E
 
     CATEGORY := Application
