@@ -21,8 +21,6 @@
 - Latest version of sfillib
 - zlib, libpng, libjpeg-turbo, freetype, libogg, and tremor from 3ds-portlibs (https://github.com/javimadgit/3ds_portlibs/ recommended)
 
-You can run the `deps.sh` script to install `sf2dlib`, `sftdlib`, `sfillib`, and `3ds-portlibs` automatically.
-
 Run `make` to build the 3DSX, CIA, and ZIP files,  `make run` to build & run on Citra. A debug build with debugging symbols will be built by default, append `DEBUG=0` to the make command to build a production build.
 
 # Thanks
