@@ -6,7 +6,7 @@
 std::map<std::string, std::wstring> ITALIAN = {
 	// UI.CPP
 	{"scanning",            L"Scansione dei temi..."},
-	{"error_message",       L"Si è verificato un errore. Hai la versione di Themely %s."},
+	{"error_message",       L"Si è verificato un errore. Hai la versione di 3DSThemeManager %s."},
 	{"press_start",         L"Premere START per abbandonare."},
 	{"themes",              L"%i theme%ls"}, // %ls è un suffisso plurale
 	{"plural_suffix",       L"s"},

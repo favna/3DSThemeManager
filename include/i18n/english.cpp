@@ -4,7 +4,7 @@
 std::map<std::string, std::wstring> ENGLISH = {
 	// UI.CPP
 	{"scanning",            L"Scanning themes..."},
-	{"error_message",       L"An error has occurred. You have Themely version %s."},
+	{"error_message",       L"An error has occurred. You have 3DSThemeManager version %s."},
 	{"press_start",         L"Press START to quit."},
 	{"themes",              L"%i theme%ls"}, // %ls is the plural suffix
 	{"plural_suffix",       L"s"},

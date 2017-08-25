@@ -852,7 +852,7 @@ void dumpTheme(){
 	for (size_t i = 0; i < 100; i++){
 		char str[3];
 		snprintf(str, 3, "%02d", i);
-		if(!FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, (string("/Themes/Themely_Dump") + str).c_str()), FS_ATTRIBUTE_DIRECTORY)){
+		if(!FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, (string("/Themes/3DSThemeManager_Dump") + str).c_str()), FS_ATTRIBUTE_DIRECTORY)){
 			num = string(str);
 			break;
 		}
@@ -900,11 +900,11 @@ void dumpTheme(){
 	if(ret)
 		return throwError(L"Failed to read BodyCache.bin. Perhaps you don't have a theme set?", ret);
 
-	ret = FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), 0, (u64)bodyCacheBin_size);
+	ret = FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/3DSThemeManager_Dump" + num + "/body_LZ.bin").c_str()), 0, (u64)bodyCacheBin_size);
 	if(ret)
 		return throwError(L"Failed to create body_LZ.bin", ret);
 
-	ret = FSUSER_OpenFile(&bodyOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/body_LZ.bin").c_str()), FS_OPEN_WRITE, 0);
+	ret = FSUSER_OpenFile(&bodyOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/3DSThemeManager_Dump" + num + "/body_LZ.bin").c_str()), FS_OPEN_WRITE, 0);
 	if(ret)
 		return throwError(L"Failed to open body_LZ.bin", ret);
 
@@ -918,8 +918,8 @@ void dumpTheme(){
 	if(!FSUSER_OpenFile(&bgmCacheBin_handle, ARCHIVE_ThemeExt, fsMakePath(PATH_ASCII, "/BgmCache.bin"), FS_OPEN_READ, 0)){
 		bgmCacheBin_buf = new u8[bgmCacheBin_size];
 		if(!FSFILE_Read(bgmCacheBin_handle, nullptr, 0, bgmCacheBin_buf, (u32)bgmCacheBin_size)){
-			if(!FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/bgm.bcstm").c_str()), 0, (u64)bgmCacheBin_size)){
-				if(!FSUSER_OpenFile(&bgmOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/Themely_Dump" + num + "/bgm.bcstm").c_str()), FS_OPEN_WRITE | FS_OPEN_CREATE, 0)){
+			if(!FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/3DSThemeManager_Dump" + num + "/bgm.bcstm").c_str()), 0, (u64)bgmCacheBin_size)){
+				if(!FSUSER_OpenFile(&bgmOutput_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, ("/Themes/3DSThemeManager_Dump" + num + "/bgm.bcstm").c_str()), FS_OPEN_WRITE | FS_OPEN_CREATE, 0)){
 					FSFILE_Write(bgmOutput_handle, nullptr, 0, bgmCacheBin_buf, bgmCacheBin_size, FS_WRITE_FLUSH);
 
 					FSFILE_Close(bgmOutput_handle);
@@ -947,7 +947,7 @@ void dumpTheme(){
 		FS_DirectoryEntry* entry = new FS_DirectoryEntry;
 		FSDIR_Read(themeDir, &entriesRead, 1, entry);
 		if(entriesRead){
-			if(!u16tstr(entry->name, 0x106).compare("Themely_Dump" + num)){
+			if(!u16tstr(entry->name, 0x106).compare("3DSThemeManager_Dump" + num)){
 				foundEntry = entry;
 				break;
 			}
@@ -995,12 +995,12 @@ void toggleBGM(){
 		unzCloseCurrentFile(zipFile);
 		unzClose(zipFile);
 
-		remove("/3ds/Themely/tmp/bgm.ogg");
-		ofstream tmpOggFile("/3ds/Themely/tmp/bgm.ogg", ios::out | ios::binary);
+		remove("/3ds/3DSThemeManager/tmp/bgm.ogg");
+		ofstream tmpOggFile("/3ds/3DSThemeManager/tmp/bgm.ogg", ios::out | ios::binary);
 		tmpOggFile.write(&oggData[0], oggData.size());
 		tmpOggFile.close();
 
-		path = "/3ds/Themely/tmp/bgm.ogg";
+		path = "/3ds/3DSThemeManager/tmp/bgm.ogg";
 	} else
 		path = string("/Themes/") + themes[currentSelectedItem].fileName + "/bgm.ogg";
 

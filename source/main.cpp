@@ -67,9 +67,9 @@ void start(){
 
 	// Create directory
 	FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/"), FS_ATTRIBUTE_DIRECTORY);
-	FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/"), FS_ATTRIBUTE_DIRECTORY);
-	FSUSER_DeleteDirectoryRecursively(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp"));
-	FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp/"), FS_ATTRIBUTE_DIRECTORY);
+	FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/"), FS_ATTRIBUTE_DIRECTORY);
+	FSUSER_DeleteDirectoryRecursively(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/tmp"));
+	FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/tmp/"), FS_ATTRIBUTE_DIRECTORY);
 	FSUSER_CreateDirectory(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/Themes"), FS_ATTRIBUTE_DIRECTORY);
 
 	// Load config
@@ -103,7 +103,7 @@ void cleanup(){
 	if(STATE.shouldSaveConfig)
 		CONFIG_save();
 
-	FSUSER_DeleteDirectoryRecursively(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp"));
+	FSUSER_DeleteDirectoryRecursively(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/tmp"));
 
 	FSUSER_CloseArchive(ARCHIVE_SD);
 	FSUSER_CloseArchive(ARCHIVE_HomeExt);

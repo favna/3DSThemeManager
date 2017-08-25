@@ -4,7 +4,7 @@
 std::map<std::string, std::wstring> FRENCH = {
 	// UI.CPP
 	{"scanning",            L"Indexage en cours..."},
-	{"error_message",       L"Une erreur est survenue. Vous avez Themely version %s."},
+	{"error_message",       L"Une erreur est survenue. Vous avez 3DSThemeManager version %s."},
 	{"press_start",         L"Appuyez sur START pour quitter."},
 	{"themes",              L"%i thème%ls"}, // %ls is the plural suffix
 	{"plural_suffix",       L"s"},

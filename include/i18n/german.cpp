@@ -6,7 +6,7 @@
 std::map<std::string, std::wstring> GERMAN = {
 	// UI.CPP
 	{"scanning",            L"Suche nach Themes..."},
-	{"error_message",       L"Ein Fehler ist aufgetreten. Deine Themely Version ist %s."},
+	{"error_message",       L"Ein Fehler ist aufgetreten. Deine 3DSThemeManager Version ist %s."},
 	{"press_start",         L"Drücke Start zum Beenden."},
 	{"themes",              L"%i Themes%ls"},
 	{"plural_suffix",       L""},

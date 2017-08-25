@@ -6,7 +6,7 @@
 std::map<std::string, std::wstring> RUSSIAN = {
 	// UI.CPP
 	{"scanning",            L"Сканирую темы..."},
-	{"error_message",       L"Возникла ошибка. У вас Themely версии %s."},
+	{"error_message",       L"Возникла ошибка. У вас 3DSThemeManager версии %s."},
 	{"press_start",         L"Нажмите START чтобы выйти."},
 	{"themes",              L"%i тем%ls"}, // %ls is the plural suffix
 	{"plural_suffix",       L"ы"},

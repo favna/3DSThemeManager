@@ -23,7 +23,7 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 	do {
 		ret = httpcOpenContext(&context, HTTPC_METHOD_GET, url.c_str(), 1);
 		ret = httpcSetSSLOpt(&context, SSLCOPT_DisableVerify);
-		ret = httpcAddRequestHeaderField(&context, "User-Agent", (string("Themely/") + VERSION).c_str());
+		ret = httpcAddRequestHeaderField(&context, "User-Agent", (string("3DSThemeManager/") + VERSION).c_str());
 		ret = httpcAddRequestHeaderField(&context, "Accept-Language", "en");
 		ret = httpcAddRequestHeaderField(&context, "Connection", "Keep-Alive");
 
@@ -149,7 +149,7 @@ Result HTTPGet(vector<char>& returnedVec, string url, string* fileName, int* pro
 void checkForUpdate(void*){
 	vector<char> httpData;
 	bool bleeding = string(VERSION).substr(string(VERSION).find("-") + 1) == "git";
-	Result ret = HTTPGet(httpData, string("https://api.github.com/repos/ihaveamac/Themely") + (bleeding ? "-bleeding" : "") + "/releases");
+	Result ret = HTTPGet(httpData, string("https://api.github.com/repos/favna/3DSThemeManager/releases");
 	if(ret){
 		printf("Failed to check for an update.\n");
 		return;
@@ -165,7 +165,7 @@ void checkForUpdate(void*){
 	}
 
 	if((!bleeding && releases[0]["tag_name"] != string("v") + VERSION) || (bleeding && releases[0]["tag_name"] != string(VERSION).substr(0, string(VERSION).find("-git")))){
-		update = string("You have Themely version ") + VERSION + ".\n\n";
+		update = string("You have 3DSThemeManager version ") + VERSION + ".\n\n";
 		update += releases[0]["tag_name"];
 		update += ":\n";
 		update += releases[0]["body"];
@@ -211,16 +211,16 @@ void installUpdate(){
 			return throwError(i18n("err_update_dl_fail") + L" " + i18n("err_update_manual"), ret, true);
 
 		Handle threedsxHandle;
-		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely.3dsx"));
-		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"));
-		if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"), 0, (u64)threedsxData.size()))
-			return throwError("Failed to create Themely.3dsx", 0, true);
+		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager.3dsx"));
+		FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/3DSThemeManager.3dsx"));
+		if(FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/3DSThemeManager.3dsx"), 0, (u64)threedsxData.size()))
+			return throwError("Failed to create 3DSThemeManager.3dsx", 0, true);
 
-		if(FSUSER_OpenFile(&threedsxHandle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/Themely.3dsx"), FS_OPEN_WRITE, 0))
-			return throwError("Failed to open Themely.3dsx", 0, true);
+		if(FSUSER_OpenFile(&threedsxHandle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/3DSThemeManager.3dsx"), FS_OPEN_WRITE, 0))
+			return throwError("Failed to open 3DSThemeManager.3dsx", 0, true);
 
 		if(FSFILE_Write(threedsxHandle, nullptr, 0, &threedsxData[0], (u64)threedsxData.size(), FS_WRITE_FLUSH))
-			return throwError("Failed to write to Themely.3dsx.", 0, true);
+			return throwError("Failed to write to 3DSThemeManager.3dsx.", 0, true);
 
 		FSFILE_Close(threedsxHandle);
 	} else {
@@ -269,14 +269,14 @@ void downloadThemeFromURL(void* url){
 
 	// store it temporarily
 	Handle tmpZip_handle;
-	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"));
-	ret = FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), 0, (u64)zipData.size());
+	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/tmp.zip"));
+	ret = FSUSER_CreateFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/tmp.zip"), 0, (u64)zipData.size());
 	if(ret){
 		downloading = -1;
 		return throwError("Failed to create temporary ZIP file", ret);
 	}
 
-	ret = FSUSER_OpenFile(&tmpZip_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), FS_OPEN_WRITE, 0);
+	ret = FSUSER_OpenFile(&tmpZip_handle, ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/tmp.zip"), FS_OPEN_WRITE, 0);
 	if(ret){
 		downloading = -1;
 		return throwError("Failed to open temporary ZIP file", ret);
@@ -291,7 +291,7 @@ void downloadThemeFromURL(void* url){
 	FSFILE_Close(tmpZip_handle);
 
 	// verify if the zip is correct
-	unzFile zipFile = unzOpen("/3ds/Themely/tmp.zip");
+	unzFile zipFile = unzOpen("/3ds/3DSThemeManager/tmp.zip");
 	if(!zipFile){
 		downloading = -1;
 		return throwError(i18n("err_zip_invalid"));
@@ -308,7 +308,7 @@ void downloadThemeFromURL(void* url){
 
 	// move file
 	FSUSER_DeleteFile(ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str()));
-	ret = FSUSER_RenameFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/Themely/tmp.zip"), ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str()));
+	ret = FSUSER_RenameFile(ARCHIVE_SD, fsMakePath(PATH_ASCII, "/3ds/3DSThemeManager/tmp.zip"), ARCHIVE_SD, fsMakePath(PATH_UTF16, (u"/Themes/" + strtu16str(fileName)).c_str()));
 	if(ret){
 		downloading = -1;
 		return throwError("Failed to move from temporary path to /Themes", ret);
