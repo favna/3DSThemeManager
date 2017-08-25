@@ -79,7 +79,7 @@ void drawMain(gfxScreen_t screen){
 		}
 
 		// bar
-		sf2d_draw_rectangle(0, 0, 400, 30, 0xFFBC47AB);
+		sf2d_draw_rectangle(0, 0, 400, 30, 0xFF3743ED);
 
 		// logo
 		sf2d_draw_texture_part(TEXTURE.ui.tx, 6, 6, 0, 0, 74, 19);
@@ -182,7 +182,7 @@ void drawMain(gfxScreen_t screen){
 				} else if(downloading > -1){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
 					sftd_draw_wtext_center_xy(FONT.huge, 0, 0, 0xFFFFFFFF, 48, i18n("downloading").c_str());
-					sf2d_draw_rectangle(0, 215, downloading * 4, 25, 0xFFBC47AB);
+					sf2d_draw_rectangle(0, 215, downloading * 4, 25, 0xFF3743ED);
 					sftd_draw_text_center(FONT.normal, 0, 219, 0xFFFFFFFF, 13, (to_string(downloading) + "%").c_str());
 				} else if(update.size() != 0){
 					sf2d_draw_rectangle(0, 0, 400, 240, 0xEE000000);
@@ -236,7 +236,7 @@ void drawMain(gfxScreen_t screen){
 		}
 
 		// bar
-		sf2d_draw_rectangle(0, 0, 320, 30, 0xFFBC47AB);
+		sf2d_draw_rectangle(0, 0, 320, 30, 0xFF3743ED);
 
 		if(shuffleMode){
 			int selected = 0;
@@ -313,7 +313,7 @@ void drawMain(gfxScreen_t screen){
 
 void drawLoading(gfxScreen_t screen){
 	if(screen == GFX_TOP){
-		sf2d_draw_rectangle(0, 0, 400, 240, 0xFFBC47AB);
+		sf2d_draw_rectangle(0, 0, 400, 240, 0xFF3743ED);
 		sf2d_draw_texture_part(TEXTURE.ui.tx, 0, 0, 400, 30, 400, 240);
 		sftd_draw_wtext_center(FONT.light, 0, 188, 0xFFFFFFFF, 24, i18n("scanning").c_str());
 		//sftd_draw_text(FONT.normal, 295, 73, 0xFFFFFFFF, 13, ("v" + VERSION).c_str());
