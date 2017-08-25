@@ -54,8 +54,8 @@ ifeq ($(TARGET),3DS)
     LIBRARY_DIRS += $(DEVKITPRO)/libctru
     LIBRARIES += ctru
 
-    PRODUCT_CODE := CIA-Z-TMMN
-    UNIQUE_ID := 0x20A6E
+    PRODUCT_CODE := CIA-F-3DTM
+    UNIQUE_ID := 0x374E5
 
     CATEGORY := Application
     USE_ON_SD := true
