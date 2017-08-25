@@ -126,7 +126,6 @@ void cleanup(){
 int main(int argc, char **argv){
 	start();
 
-	queueTask(checkForUpdate, 0);
 	queueTask(scanThemes, 0);
 
 	// Main loop
