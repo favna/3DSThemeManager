@@ -35,4 +35,6 @@ Run `make` to build the 3DSX, CIA, and ZIP files,  `make run` to build & run on 
 - umbjolt for Spanish translation
 
 # License
-This software is unlicensed as it already breaks the original license set on the software by ErmanSaying
+This software is licensed under GNU GPLv3. Check LICENSE.md.
+
+Copyright (c) 2017 Erman SAYIN
